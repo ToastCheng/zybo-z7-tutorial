@@ -8,7 +8,7 @@ TOP ?= top_hello
 # Vivado executable.
 VIVADO ?= vivado
 
-.PHONY: all build prog sim clean
+.PHONY: all build prog sim clean help
 
 all: build
 
@@ -20,17 +20,21 @@ build:
 prog:
 	$(VIVADO) -mode batch -source scripts/program.tcl -tclargs $(TOP)
 
-# Run a simulation (placeholder; will be implemented in a later phase).
+# Run a simulation using Vivado Simulator.
+# Example: make sim TB=tb_edge_detect
+TB ?= tb_edge_detect
 sim:
-	@echo "Simulation target not yet implemented. Set TB=<testbench> when ready."
+	$(VIVADO) -mode batch -source scripts/sim.tcl -tclargs $(TB)
 
-# Remove generated build artifacts.
+# Remove generated build and simulation artifacts.
 clean:
-	rm -rf build/
+	rm -rf build/ xsim.dir/ .Xil/
+	rm -f *.pb *.log *.jou *.str
 
 # Print a short help message.
 help:
 	@echo "Targets:"
 	@echo "  make build TOP=<top>   - Synthesize and generate a bitstream"
 	@echo "  make prog  TOP=<top>   - Program the FPGA via JTAG"
-	@echo "  make clean             - Remove build artifacts"
+	@echo "  make sim   TB=<tb>     - Run a testbench in Vivado Simulator"
+	@echo "  make clean             - Remove build and simulation artifacts"

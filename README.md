@@ -246,6 +246,9 @@ make prog
 | `edge_detect` | `rtl/common/edge_detect.sv` | Rising/falling edge detector |
 | `top_hello` | `rtl/top/top_hello.sv` | Phase 0: simple LED blinker ✅ |
 | `top_button_led` | `rtl/top/top_button_led.sv` | Phase 1: button-controlled LED ✅ |
+| `tb_sync` | `rtl/tb/tb_sync.sv` | Testbench for synchronizer |
+| `tb_debounce` | `rtl/tb/tb_debounce.sv` | Testbench for debouncer |
+| `tb_edge_detect` | `rtl/tb/tb_edge_detect.sv` | Testbench for edge detector |
 
 This table will grow as we add phases.
 
