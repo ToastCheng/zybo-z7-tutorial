@@ -1,0 +1,18 @@
+# Vivado generated files
+build/
+*.cache/
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
+*.srcs/
+*.xpr
+*.jou
+*.log
+*.str
+
+# Editor artifacts
+.vscode/
+*.swp
+*.swo
+*~
