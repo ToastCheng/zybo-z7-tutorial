@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 //------------------------------------------------------------------------------
 // top_button_led.sv
 // Phase 1: Button-controlled LEDs.

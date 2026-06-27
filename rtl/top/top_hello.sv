@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 //------------------------------------------------------------------------------
 // top_hello.sv
 // Phase 0: "Hello World" LED blinker.

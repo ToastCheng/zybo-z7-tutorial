@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 //------------------------------------------------------------------------------
 // edge_detect.sv
 // Rising- and falling-edge detector.

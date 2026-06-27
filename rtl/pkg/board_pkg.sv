@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 //------------------------------------------------------------------------------
 // board_pkg.sv
 // Shared constants and types for the Zybo Z7-10 board.
