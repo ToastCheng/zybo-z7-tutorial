@@ -40,6 +40,60 @@ The Zybo Z7-10 LEDs turn on when the FPGA pin is driven to `1`.
                         |---> rgb_led   = counter[28:26]
 ```
 
+## Top-Level Module = Entry Point
+
+`top_hello` is the **top-level module** of this design. In FPGA development, the top-level module is the equivalent of a `main()` function in software — it is the entry point where synthesis begins.
+
+### There is no `main()` in HDL
+
+In software:
+
+```c
+int main() {
+    // program starts here
+}
+```
+
+In HDL/FPGA:
+
+```systemverilog
+module top_hello (
+    // ports connected to the outside world
+);
+    // hardware starts here
+endmodule
+```
+
+The entire design is a parallel hardware circuit. Every `always_ff` block and every `assign` statement describes hardware that runs simultaneously once the FPGA is configured.
+
+### Standard port list
+
+Every top-level module in this project uses the same ports:
+
+```systemverilog
+module top_xxx (
+    input  logic clk,
+    input  logic [3:0] btn,
+    input  logic [3:0] sw,
+    output logic [3:0] led,
+    output logic [2:0] rgb_led
+);
+```
+
+This lets us reuse the same `constraints/zybo_z7_10.xdc` file. You only change `TOP=` in the Makefile to switch between demo phases.
+
+### Hierarchy for Phase 0
+
+Phase 0 is very simple: the top-level module contains only a counter and some wiring. There are no sub-modules yet.
+
+```text
+top_hello  (top-level entry point)
+│
+└── counter + combinational assignments to LEDs
+```
+
+Later phases will instantiate reusable modules inside the top-level module.
+
 ## Code Walkthrough
 
 ```systemverilog
