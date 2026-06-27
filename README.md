@@ -209,8 +209,10 @@ Every module contains a `README.md` with these sections:
 ## Current Status
 
 - [x] Git repository initialized with `.gitignore` and agent guidelines.
+- [x] Git repository initialized with `.gitignore` and agent guidelines.
 - [x] Phase 0 (`top_hello`) implemented, built, and programmed on hardware.
 - [x] Phase 1 (`top_button_led`) implemented, built, and programmed on hardware.
+- [x] Testbenches added for `sync`, `debounce`, and `edge_detect`.
 - [ ] Phase 2: PWM RGB LED.
 
 ## Getting Started
