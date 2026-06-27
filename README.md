@@ -206,6 +206,12 @@ Every module contains a `README.md` with these sections:
 
 ---
 
+## Current Status
+
+- [x] Git repository initialized with `.gitignore` and agent guidelines.
+- [x] Phase 0 (`top_hello`) implemented, built, and programmed on hardware.
+- [ ] Phase 1: Button-controlled LED.
+
 ## Getting Started
 
 1. Clone or open this repository.
@@ -234,7 +240,7 @@ make prog
 | Module | Path | Description |
 |--------|------|-------------|
 | `board_pkg` | `rtl/pkg/board_pkg.sv` | Shared board constants |
-| `top_hello` | `rtl/top/top_hello.sv` | Phase 0: simple LED blinker |
+| `top_hello` | `rtl/top/top_hello.sv` | Phase 0: simple LED blinker ✅ |
 
 This table will grow as we add phases.
 
