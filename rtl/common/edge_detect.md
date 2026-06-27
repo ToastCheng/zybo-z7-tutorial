@@ -67,24 +67,21 @@ Think of it as a photographer taking a picture of `din` at every clock edge. The
 
 Suppose a button press makes `din` go high just before clock cycle 3, and stay high until it is released after cycle 6.
 
+Each column below is one clock cycle (6 characters wide). The vertical `|` markers show the clock edges.
+
 ```
-Clock cycle:    0    1    2    3    4    5    6    7
-                |    |    |    |    |    |    |    |
-clk          __|____|____|____|____|____|____|____|__
-             0    1    2    3    4    5    6    7
-
-din          ____/-----------------------\__________
-             0  0  0  1  1  1  1  0
-
-din_q        ___________/-----------------------\___
-             0  0  0  0  1  1  1  1
-
-rising       ______________/\_______________________
-             0  0  0  1  0  0  0  0
-
-falling      ________________________________/\_____
-             0  0  0  0  0  0  0  1
+Cycle:    0     1     2     3     4     5     6     7
+          |     |     |     |     |     |     |     |
+din:      _____________________/-----------------------\__
+din_q:    ___________________________/-----------------\__
+rising:   _____________________/--________________________
+falling:  _____________________________________________/--
 ```
+
+- `din` goes low → high during cycle 3, and high → low during cycle 7.
+- `din_q` is the same shape shifted right by one cycle because it captures the previous value.
+- `rising` produces a single pulse during cycle 3, when `din` is `1` but `din_q` is still `0`.
+- `falling` produces a single pulse during cycle 7, when `din` is `0` but `din_q` is still `1`.
 
 ### What happens at each rising clock edge
 
