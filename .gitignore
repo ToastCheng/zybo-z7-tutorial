@@ -16,3 +16,6 @@ build/
 *.swp
 *.swo
 *~
+
+# Vivado temporary directory
+.Xil/
