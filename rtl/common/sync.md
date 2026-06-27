@@ -103,6 +103,44 @@ The key insight is that we are not trying to get the newest value faster. We are
    - If `FF1` has already resolved, `FF2` captures a clean digital level and will **not** go metastable.
    - Only if `FF1` is still metastable after 8 ns can `FF2` also fail. That probability is extremely small.
 
+### What if we use more stages?
+
+You might ask: *"The input is locked into FF1 at the first clock edge. Adding more stages does not give `din0` more time to change FF1, so how does it help?"*
+
+The answer is that extra stages give the **metastable state inside the flip-flops** more time to resolve.
+
+Here is a 3-stage synchronizer:
+
+```text
+clock X    clock X+1    clock X+2
+  |            |            |
+  v            v            v
+FF1  ------>  FF2  ------>  FF3  ------> dout
+```
+
+| Clock | What happens |
+|---|---|
+| X | FF1 samples `din0`. If unlucky, FF1 goes metastable. |
+| X → X+1 | FF1 has 8 ns to resolve to a valid `0` or `1`. |
+| X+1 | FF2 samples FF1. If FF1 resolved, FF2 gets a clean value and we are done. If FF1 is **still** metastable (very rare), FF2 may also go metastable. |
+| X+1 → X+2 | FF2 now has another 8 ns to resolve. |
+| X+2 | FF3 samples FF2. The chance that FF2 is still metastable is now extremely tiny. |
+
+With 3 stages, a metastable state has **16 ns** total to die out before it can reach `dout`.
+
+### The resolved value may not match `din0`
+
+When FF1 resolves from metastability, it settles to either `0` or `1`. Which one it chooses is unpredictable — it might be the old value or the new value.
+
+For example, if you press a button and the input changes at the exact wrong time, the synchronizer might output:
+
+- the pressed value, or
+- the not-pressed value for one more cycle.
+
+**This is fine.** For a button, we only care that the output is a valid `0` or `1`, not that it matches the exact current state of the button. The press will be registered one cycle earlier or later, which is irrelevant to a human.
+
+> **Key takeaway:** A synchronizer guarantees a valid digital level. It does not guarantee which level, if the input changes during the forbidden window.
+
 ### What we give up
 
 The output `dout` is **not** the current value of `din`. It is the value of `din` from one clock cycle ago. That is fine for a button — we do not care whether the press is detected 8 ns earlier or later.
