@@ -27,12 +27,19 @@ With 2 stages, the input should appear at the output two clock cycles later.
 ### Clean Digital Values
 
 ```systemverilog
-if (dout === 1'bx || dout === 1'bz) $error("dout is not a clean digital value");
+if (dout === 1'bx || dout === 1'bz) begin
+    $error("dout is not a clean digital value");
+    error_count++;
+end
 ```
 
 - `x` means unknown.
 - `z` means high-impedance (floating).
 - A properly functioning synchronizer output should never be `x` or `z`.
+
+### Error Counter
+
+The testbench uses an `error_count` variable. Each failed assertion increments it. At the end, the testbench prints **passed** only if `error_count` is zero.
 
 ## How to Run
 

@@ -18,6 +18,9 @@ module tb_sync;
     logic din;
     logic dout;
 
+    // Error counter.
+    int error_count;
+
     // Instantiate the DUT with default 2 stages.
     sync dut (
         .clk  (clk),
@@ -35,31 +38,54 @@ module tb_sync;
     initial begin
         $display("Starting sync testbench...");
 
+        error_count = 0;
         din = 0;
 
         // Wait for the initial state to propagate.
-        @(posedge clk);
-        @(posedge clk);
-        if (dout !== 0) $error("Expected dout = 0 initially");
+        @(negedge clk);
+        @(negedge clk);
+        if (dout !== 0) begin
+            $error("Expected dout = 0 initially");
+            error_count++;
+        end
 
         // Change din and verify it appears at dout two cycles later.
         din = 1;
-        @(posedge clk);
-        if (dout !== 0) $error("dout should still be 0 after 1 cycle");
-        @(posedge clk);
-        if (dout !== 1) $error("dout should be 1 after 2 cycles");
+        @(negedge clk);
+        if (dout !== 0) begin
+            $error("dout should still be 0 after 1 cycle");
+            error_count++;
+        end
+        @(negedge clk);
+        if (dout !== 1) begin
+            $error("dout should be 1 after 2 cycles");
+            error_count++;
+        end
 
         // Change din back to 0 and verify the delay.
         din = 0;
-        @(posedge clk);
-        if (dout !== 1) $error("dout should still be 1 after 1 cycle");
-        @(posedge clk);
-        if (dout !== 0) $error("dout should be 0 after 2 cycles");
+        @(negedge clk);
+        if (dout !== 1) begin
+            $error("dout should still be 1 after 1 cycle");
+            error_count++;
+        end
+        @(negedge clk);
+        if (dout !== 0) begin
+            $error("dout should be 0 after 2 cycles");
+            error_count++;
+        end
 
         // Verify dout is always a clean digital value (not X or Z).
-        if (dout === 1'bx || dout === 1'bz) $error("dout is not a clean digital value");
+        if (dout === 1'bx || dout === 1'bz) begin
+            $error("dout is not a clean digital value");
+            error_count++;
+        end
 
-        $display("sync testbench passed.");
+        if (error_count == 0) begin
+            $display("sync testbench passed.");
+        end else begin
+            $display("sync testbench failed with %0d errors.", error_count);
+        end
         $finish;
     end
 

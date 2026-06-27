@@ -42,4 +42,15 @@ exec xelab $tb -s ${tb}_sim
 puts "Running simulation..."
 exec xsim ${tb}_sim -runall
 
+# Vivado Simulator writes $display output to xsim.log.
+# Print it so the user sees the testbench messages.
+set log_file "xsim.log"
+if { [file exists $log_file] } {
+    puts ""
+    puts "--- $log_file ---"
+    set fh [open $log_file r]
+    puts [read $fh]
+    close $fh
+}
+
 puts "Simulation complete."

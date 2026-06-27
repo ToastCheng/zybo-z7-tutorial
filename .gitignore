@@ -19,3 +19,4 @@ build/
 
 # Vivado temporary directory
 .Xil/
+clockInfo.txt

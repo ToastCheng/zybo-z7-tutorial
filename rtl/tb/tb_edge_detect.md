@@ -33,15 +33,42 @@ end
 
 This creates a clock with an 8 ns period (125 MHz). `forever` means the loop runs for the entire simulation.
 
+### Capturing One-Cycle Pulses
+
+`rising` and `falling` are each high for only one clock cycle. If we try to check them directly, we can hit a **race condition**: the check and the flip-flop update happen at the same clock edge, and the order is unpredictable.
+
+To avoid this, the testbench latches the pulses into registers:
+
+```systemverilog
+always_ff @(posedge clk) begin
+    if (reset_flags) begin
+        rising_seen  <= 0;
+        falling_seen <= 0;
+    end else begin
+        if (rising)  rising_seen  <= 1;
+        if (falling) falling_seen <= 1;
+    end
+end
+```
+
+These flags stay high until we synchronously reset them, so we can safely check them later in the simulation.
+
 ### Checking Outputs
 
 ```systemverilog
-if (rising !== 1) $error("Expected rising pulse after rising edge");
+if (rising_seen !== 1) begin
+    $error("Expected rising pulse after rising edge");
+    error_count++;
+end
 ```
 
 - `!==` is the case-equality operator; it also checks for `x` and `z` values.
 - `$error` prints an error message but continues the simulation.
-- `$fatal` would stop the simulation immediately.
+- We count errors and report pass/fail at the end.
+
+### Why Check at `negedge clk`?
+
+Registered signals (like `dout` of a synchronizer) are stable shortly after the rising clock edge. But combinational pulses generated at the rising edge are only valid for a brief moment. By checking the latched flags at the **falling** clock edge, we give the flags time to update and avoid race conditions.
 
 ## How to Run
 
