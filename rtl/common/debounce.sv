@@ -22,12 +22,8 @@ module debounce #(
     localparam int THRESHOLD  = (CLK_FREQ_HZ / 1_000_000) * STABLE_US;
     localparam int CNT_WIDTH  = $clog2(THRESHOLD + 1);
 
-    logic [CNT_WIDTH-1:0] counter;
-    logic                 dout_reg;
-
-    initial begin
-        dout_reg = 1'b0;
-    end
+    logic [CNT_WIDTH-1:0] counter = '0;
+    logic                 dout_reg = 1'b0;
 
     always_ff @(posedge clk) begin
         if (din == dout_reg) begin

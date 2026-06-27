@@ -52,11 +52,7 @@ module top_button_led (
     endgenerate
 
     // Toggle register for the four LEDs.
-    logic [NUM_LEDS-1:0] led_reg;
-
-    initial begin
-        led_reg = '0;
-    end
+    logic [NUM_LEDS-1:0] led_reg = '0;
 
     always_ff @(posedge clk) begin
         for (int j = 0; j < NUM_LEDS; j++) begin

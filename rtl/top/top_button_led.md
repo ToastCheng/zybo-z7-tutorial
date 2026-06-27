@@ -38,17 +38,15 @@ led_reg[j] <= ~led_reg[j];
 
 This inverts the current value: 0 becomes 1, and 1 becomes 0.
 
-### `initial` Blocks in FPGAs
+### Initial Values in FPGAs
 
 ```systemverilog
-initial begin
-    led_reg = '0;
-end
+logic [NUM_LEDS-1:0] led_reg = '0;
 ```
 
-This sets the power-on value of the register. It is **synthesizable in FPGAs** because the bitstream configures the initial state of each flip-flop. It is **not synthesizable in ASICs**, where a reset signal is required.
+This sets the power-on value of the register by initializing it in the declaration. It is **synthesizable in FPGAs** because the bitstream configures the initial state of each flip-flop. It is **not synthesizable in ASICs**, where a reset signal is required.
 
-For this learning board, using `initial` keeps the design simple. In safety-critical or ASIC designs, you would use a dedicated reset.
+For this learning board, initialization keeps the design simple. In safety-critical or ASIC designs, you would use a dedicated reset.
 
 ### `generate` Loops
 
