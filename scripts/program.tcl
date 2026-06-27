@@ -32,8 +32,14 @@ connect_hw_server -allow_non_jtag
 # Open the first available JTAG target.
 open_hw_target
 
-# Select the first device on the target.
-set hw_device [lindex [get_hw_devices] 0]
+# The Zynq JTAG chain exposes two devices: the ARM DAP (not programmable)
+# and the FPGA (xc7z010). Select the FPGA by matching its part name.
+set hw_device [get_hw_devices *xc7z010*]
+if { $hw_device eq "" } {
+    puts "ERROR: Could not find a programmable FPGA device on the JTAG chain."
+    puts "Available devices: [get_hw_devices]"
+    exit 1
+}
 puts "Using hardware device: $hw_device"
 
 # Attach the bitstream and program the device.
