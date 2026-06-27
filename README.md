@@ -157,7 +157,7 @@ We build the project in small, self-contained phases. Each phase adds one new co
 | Phase | Name | Concept | Top Module |
 |-------|------|---------|------------|
 | 0 | Hello LED | Toolchain + blinking LED | `top_hello` |
-| 1 | Button-Controlled LED | Synchronization, debounce, edge detection | `top_button_led` |
+| 1 | Button-Controlled LED | Synchronization, debounce, edge detection | `top_button_led` ✅ |
 | 2 | PWM RGB LED | Pulse-width modulation, parameters | `top_pwm_rgb` |
 | 3 | Switch Modes | Multiplexers, pattern generators | `top_switch_modes` |
 | 4 | UART Loopback | Serial communication | `top_uart_loopback` |
@@ -210,7 +210,8 @@ Every module contains a `README.md` with these sections:
 
 - [x] Git repository initialized with `.gitignore` and agent guidelines.
 - [x] Phase 0 (`top_hello`) implemented, built, and programmed on hardware.
-- [ ] Phase 1: Button-controlled LED.
+- [x] Phase 1 (`top_button_led`) implemented, built, and programmed on hardware.
+- [ ] Phase 2: PWM RGB LED.
 
 ## Getting Started
 
@@ -240,7 +241,11 @@ make prog
 | Module | Path | Description |
 |--------|------|-------------|
 | `board_pkg` | `rtl/pkg/board_pkg.sv` | Shared board constants |
+| `sync` | `rtl/common/sync.sv` | Input synchronizer |
+| `debounce` | `rtl/common/debounce.sv` | Button debouncer |
+| `edge_detect` | `rtl/common/edge_detect.sv` | Rising/falling edge detector |
 | `top_hello` | `rtl/top/top_hello.sv` | Phase 0: simple LED blinker ✅ |
+| `top_button_led` | `rtl/top/top_button_led.sv` | Phase 1: button-controlled LED ✅ |
 
 This table will grow as we add phases.
 

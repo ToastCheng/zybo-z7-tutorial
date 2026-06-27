@@ -23,9 +23,11 @@ set_part $part_name
 # Output directory.
 file mkdir build
 
-# Read the shared package and the requested top-level module.
-# Additional common RTL files can be added here as the project grows.
-read_verilog -sv rtl/pkg/board_pkg.sv
+# Read the shared package, all reusable common modules, and the requested
+# top-level module. As we add more common modules, they are picked up
+# automatically from rtl/common/.
+read_verilog -sv [glob rtl/pkg/*.sv]
+read_verilog -sv [glob rtl/common/*.sv]
 read_verilog -sv rtl/top/${top}.sv
 
 # Read constraints.
