@@ -15,7 +15,12 @@ module top_pwm_rgb (
     input  logic [3:0] btn,
     input  logic [3:0] sw,
     output logic [3:0] led,
-    output logic [2:0] rgb_led
+    output logic [2:0] rgb_led,
+
+    // UART pins on Pmod JE. Not used in this phase; kept for a shared
+    // top-level port list across all phases.
+    input  logic uart_rx,
+    output logic uart_tx
 );
 
     import board_pkg::*;
@@ -66,5 +71,8 @@ module top_pwm_rgb (
 
     // Single-color LEDs are off in this phase.
     assign led = 4'b0000;
+
+    // Hold UART transmit line idle in this phase.
+    assign uart_tx = 1'b1;
 
 endmodule : top_pwm_rgb

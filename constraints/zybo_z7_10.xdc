@@ -42,3 +42,11 @@ set_property -dict { PACKAGE_PIN M17 IOSTANDARD LVCMOS33 } [get_ports { rgb_led[
 # Note: RGB LED LD5 exists only on the Zybo Z7-20. Its pins are:
 #   led5_r -> Y11, led5_g -> T5, led5_b -> Y12
 # Uncomment and add a second rgb_led entry if you migrate to the Z7-20.
+
+#------------------------------------------------------------------------------
+# UART pins on Pmod JE (standard Pmod, 200 ohm series resistors).
+#   JE1 (V12) = uart_rx   (FPGA input from host TX)
+#   JE2 (W16) = uart_tx   (FPGA output to host RX)
+#------------------------------------------------------------------------------
+set_property -dict { PACKAGE_PIN V12 IOSTANDARD LVCMOS33 } [get_ports { uart_rx }];
+set_property -dict { PACKAGE_PIN W16 IOSTANDARD LVCMOS33 } [get_ports { uart_tx }];

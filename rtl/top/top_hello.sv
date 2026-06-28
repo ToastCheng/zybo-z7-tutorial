@@ -29,7 +29,12 @@ module top_hello (
     //   rgb_led[2] = Red
     //   rgb_led[1] = Green
     //   rgb_led[0] = Blue
-    output logic [2:0] rgb_led
+    output logic [2:0] rgb_led,
+
+    // UART pins on Pmod JE. Not used in this phase; kept for a shared
+    // top-level port list across all phases.
+    input  logic uart_rx,
+    output logic uart_tx
 );
 
     import board_pkg::*;
@@ -56,5 +61,8 @@ module top_hello (
     assign rgb_led[RGB_R] = counter[28];
     assign rgb_led[RGB_G] = counter[27];
     assign rgb_led[RGB_B] = counter[26];
+
+    // Hold UART transmit line idle in this phase.
+    assign uart_tx = 1'b1;
 
 endmodule : top_hello
