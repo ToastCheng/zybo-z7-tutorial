@@ -23,7 +23,7 @@ file delete -force xelab.pb
 file delete -force xsim.pb
 
 # Gather source files: package, common modules, and the selected testbench.
-set sv_files [glob -nocomplain rtl/pkg/*.sv rtl/common/*.sv rtl/tb/${tb}.sv]
+set sv_files [glob -nocomplain rtl/pkg/*.sv rtl/common/*.sv rtl/top/*.sv rtl/tb/${tb}.sv]
 if { [llength $sv_files] == 0 } {
     puts "ERROR: No source files found for testbench $tb"
     exit 1

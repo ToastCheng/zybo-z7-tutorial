@@ -20,3 +20,9 @@ build/
 # Vivado temporary directory
 .Xil/
 clockInfo.txt
+
+# Vivado Simulator artifacts
+xsim.dir/
+*.pb
+*.vcd
+*.wdb

@@ -30,8 +30,16 @@ read_verilog -sv [glob rtl/pkg/*.sv]
 read_verilog -sv [glob rtl/common/*.sv]
 read_verilog -sv rtl/top/${top}.sv
 
-# Read constraints.
+# Read the shared board constraints.
 read_xdc constraints/zybo_z7_10.xdc
+
+# Optionally read per-top constraints for designs that use extra pins
+# (for example, the audio codec pins on Phase 6).
+set top_xdc "constraints/${top}.xdc"
+if { [file exists $top_xdc] } {
+    puts "Reading per-top constraints: $top_xdc"
+    read_xdc $top_xdc
+}
 
 # Run synthesis.
 puts "Starting synthesis..."
