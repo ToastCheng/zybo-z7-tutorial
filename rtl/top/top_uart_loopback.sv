@@ -5,8 +5,12 @@
 // Phase 4: UART Loopback.
 //
 // Receives bytes on uart_rx at 115200 baud and immediately re-transmits them
-// on uart_tx.  The lower nibble of the most recently received byte is shown
+// on uart_tx.  The lower nibble of the most recently handled byte is shown
 // on the four single-color LEDs.
+//
+// A self-test mode is provided for boards without a USB-UART adapter: when
+// SW0 is high the FPGA periodically transmits an incrementing test byte.
+// Shorting uart_tx to uart_rx feeds that byte back into the receiver.
 //------------------------------------------------------------------------------
 
 `include "rtl/pkg/board_pkg.sv"
@@ -37,9 +41,7 @@ module top_uart_loopback (
     logic [7:0] pending_data = '0;
     logic       pending      = 1'b0;
 
-    // Self-test generator. If sw[0] is high and no external byte is waiting,
-    // the FPGA periodically sends an incrementing test byte.  With JE1 and
-    // JE2 shorted, this byte is received back and shown on the LEDs.
+    // Self-test generator.
     logic [31:0] test_counter = '0;
     logic [7:0]  test_byte    = '0;
 
@@ -71,25 +73,34 @@ module top_uart_loopback (
     );
 
     always_ff @(posedge clk) begin
-        if (rx_valid && !pending) begin
-            pending_data <= rx_data;
-            pending      <= 1'b1;
-        end else if (sw[0] && !pending && !tx_busy && test_tick) begin
-            pending_data <= test_byte;
-            pending      <= 1'b1;
-            test_byte    <= test_byte + 1'b1;
+        if (sw[0]) begin
+            // Self-test mode: load an incrementing test byte on each tick.
+            // External receive data is ignored so the test pattern is not
+            // overwritten by the echo.
+            if (!pending && !tx_busy && test_tick) begin
+                pending_data <= test_byte;
+                pending      <= 1'b1;
+                test_byte    <= test_byte + 1'b1;
+            end
+        end else begin
+            // Normal loopback: store the byte received from uart_rx.
+            if (rx_valid && !pending) begin
+                pending_data <= rx_data;
+                pending      <= 1'b1;
+            end
         end
 
+        // Transmit the pending byte as soon as the transmitter is free.
         if (pending && !tx_busy) begin
-            tx_data   <= pending_data;
-            tx_start  <= 1'b1;
-            pending   <= 1'b0;
+            tx_data  <= pending_data;
+            tx_start <= 1'b1;
+            pending  <= 1'b0;
         end else begin
             tx_start <= 1'b0;
         end
     end
 
-    // Visual feedback: lower nibble of the last received byte.
+    // Visual feedback: lower nibble of the last handled byte.
     assign led     = pending_data[3:0];
     assign rgb_led = 3'b000;  // RGB LED is off in this phase
 
