@@ -160,7 +160,7 @@ We build the project in small, self-contained phases. Each phase adds one new co
 | 1 | Button-Controlled LED | Synchronization, debounce, edge detection | `top_button_led` ✅ |
 | 2 | PWM RGB LED | Pulse-width modulation, parameters | `top_pwm_rgb` ✅ |
 | 3 | Switch Modes | Multiplexers, pattern generators | `top_switch_modes` ✅ |
-| 4 | UART Loopback | Serial communication | `top_uart_loopback` |
+| 4 | UART Loopback | Serial communication | `top_uart_loopback` ✅ |
 | 5 | PMOD / External I/O | Off-board interfaces | TBD |
 
 Each phase has:
@@ -209,12 +209,12 @@ Every module contains a `README.md` with these sections:
 ## Current Status
 
 - [x] Git repository initialized with `.gitignore` and agent guidelines.
-- [x] Git repository initialized with `.gitignore` and agent guidelines.
 - [x] Phase 0 (`top_hello`) implemented, built, and programmed on hardware.
 - [x] Phase 1 (`top_button_led`) implemented, built, and programmed on hardware.
 - [x] Testbenches added for `sync`, `debounce`, and `edge_detect`.
 - [x] Phase 2 (`top_pwm_rgb`) implemented.
 - [x] Phase 3 (`top_switch_modes`) implemented.
+- [x] Phase 4 (`top_uart_loopback`) implemented.
 
 ## Getting Started
 
@@ -251,12 +251,17 @@ make prog
 | `top_button_led` | `rtl/top/top_button_led.sv` | Phase 1: button-controlled LED ✅ |
 | `top_pwm_rgb` | `rtl/top/top_pwm_rgb.sv` | Phase 2: PWM RGB LED ✅ |
 | `top_switch_modes` | `rtl/top/top_switch_modes.sv` | Phase 3: switch-controlled RGB modes ✅ |
+| `top_uart_loopback` | `rtl/top/top_uart_loopback.sv` | Phase 4: UART loopback ✅ |
 | `rgb_pattern_gen` | `rtl/common/rgb_pattern_gen.sv` | RGB LED pattern generator |
+| `uart_rx` | `rtl/common/uart_rx.sv` | UART receiver |
+| `uart_tx` | `rtl/common/uart_tx.sv` | UART transmitter |
 | `pwm` | `rtl/common/pwm.sv` | PWM generator |
 | `tb_sync` | `rtl/tb/tb_sync.sv` | Testbench for synchronizer |
 | `tb_debounce` | `rtl/tb/tb_debounce.sv` | Testbench for debouncer |
 | `tb_edge_detect` | `rtl/tb/tb_edge_detect.sv` | Testbench for edge detector |
 | `tb_rgb_pattern_gen` | `rtl/tb/tb_rgb_pattern_gen.sv` | Testbench for RGB pattern generator |
+| `tb_uart_rx` | `rtl/tb/tb_uart_rx.sv` | Testbench for UART receiver |
+| `tb_uart_tx` | `rtl/tb/tb_uart_tx.sv` | Testbench for UART transmitter |
 
 This table will grow as we add phases.
 
