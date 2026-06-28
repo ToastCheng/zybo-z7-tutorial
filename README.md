@@ -158,7 +158,7 @@ We build the project in small, self-contained phases. Each phase adds one new co
 |-------|------|---------|------------|
 | 0 | Hello LED | Toolchain + blinking LED | `top_hello` |
 | 1 | Button-Controlled LED | Synchronization, debounce, edge detection | `top_button_led` ✅ |
-| 2 | PWM RGB LED | Pulse-width modulation, parameters | `top_pwm_rgb` |
+| 2 | PWM RGB LED | Pulse-width modulation, parameters | `top_pwm_rgb` ✅ |
 | 3 | Switch Modes | Multiplexers, pattern generators | `top_switch_modes` |
 | 4 | UART Loopback | Serial communication | `top_uart_loopback` |
 | 5 | PMOD / External I/O | Off-board interfaces | TBD |
@@ -213,7 +213,8 @@ Every module contains a `README.md` with these sections:
 - [x] Phase 0 (`top_hello`) implemented, built, and programmed on hardware.
 - [x] Phase 1 (`top_button_led`) implemented, built, and programmed on hardware.
 - [x] Testbenches added for `sync`, `debounce`, and `edge_detect`.
-- [ ] Phase 2: PWM RGB LED.
+- [x] Phase 2 (`top_pwm_rgb`) implemented.
+- [ ] Phase 3: Switch Modes.
 
 ## Getting Started
 
@@ -248,6 +249,8 @@ make prog
 | `edge_detect` | `rtl/common/edge_detect.sv` | Rising/falling edge detector |
 | `top_hello` | `rtl/top/top_hello.sv` | Phase 0: simple LED blinker ✅ |
 | `top_button_led` | `rtl/top/top_button_led.sv` | Phase 1: button-controlled LED ✅ |
+| `top_pwm_rgb` | `rtl/top/top_pwm_rgb.sv` | Phase 2: PWM RGB LED ✅ |
+| `pwm` | `rtl/common/pwm.sv` | PWM generator |
 | `tb_sync` | `rtl/tb/tb_sync.sv` | Testbench for synchronizer |
 | `tb_debounce` | `rtl/tb/tb_debounce.sv` | Testbench for debouncer |
 | `tb_edge_detect` | `rtl/tb/tb_edge_detect.sv` | Testbench for edge detector |
