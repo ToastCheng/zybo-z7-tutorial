@@ -20,10 +20,10 @@ module top_pwm_rgb (
 
     import board_pkg::*;
 
-    // PWM duty cycles for each color channel.
-    logic [7:0] duty_r;
-    logic [7:0] duty_g;
-    logic [7:0] duty_b;
+    // PWM duty cycles for each color channel, limited to 3 bits (0..7).
+    logic [2:0] duty_r;
+    logic [2:0] duty_g;
+    logic [2:0] duty_b;
 
     // Free-running counter used to pace the color changes.
     logic [31:0] counter;
@@ -37,28 +37,30 @@ module top_pwm_rgb (
     // color slightly, producing a smooth fade.
     always_ff @(posedge clk) begin
         if (counter[23:0] == 0) begin
-            duty_r <= duty_r + 8'd1;
-            duty_g <= duty_g + 8'd2;
-            duty_b <= duty_b + 8'd3;
+            duty_r <= duty_r + 3'd1;
+            duty_g <= duty_g + 3'd2;
+            duty_b <= duty_b + 3'd3;
         end
     end
 
     // PWM generators for each RGB channel.
+    // The 3-bit duty values are
+    // zero-extended to the 8-bit PWM resolution, so max brightness is 7/256.
     pwm #(.N(8)) pwm_r (
         .clk     (clk),
-        .duty    (duty_r),
+        .duty    ({5'b0, duty_r}),
         .pwm_out (rgb_led[RGB_R])
     );
 
     pwm #(.N(8)) pwm_g (
         .clk     (clk),
-        .duty    (duty_g),
+        .duty    ({5'b0, duty_g}),
         .pwm_out (rgb_led[RGB_G])
     );
 
     pwm #(.N(8)) pwm_b (
         .clk     (clk),
-        .duty    (duty_b),
+        .duty    ({5'b0, duty_b}),
         .pwm_out (rgb_led[RGB_B])
     );
 
