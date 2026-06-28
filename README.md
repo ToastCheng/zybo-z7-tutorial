@@ -161,7 +161,10 @@ We build the project in small, self-contained phases. Each phase adds one new co
 | 2 | PWM RGB LED | Pulse-width modulation, parameters | `top_pwm_rgb` ✅ |
 | 3 | Switch Modes | Multiplexers, pattern generators | `top_switch_modes` ✅ |
 | 4 | UART Loopback | Serial communication | `top_uart_loopback` ✅ |
-| 5 | PMOD / External I/O | Off-board interfaces | TBD |
+| 5 | FIFO | On-chip buffering and flow control | `top_fifo_loopback` ✅ |
+| 6 | I2C Master | Configure the on-board audio codec | `top_i2c_codec_probe` ✅ |
+| 7 | I2S Controller | Digital audio streaming | `top_i2s_tone` |
+| 8 | Audio Loopback / Tone | I2C + I2S together: line-in → headphones or generated tone | `top_audio_loopback` |
 
 Each phase has:
 
@@ -215,6 +218,8 @@ Every module contains a `README.md` with these sections:
 - [x] Phase 2 (`top_pwm_rgb`) implemented.
 - [x] Phase 3 (`top_switch_modes`) implemented.
 - [x] Phase 4 (`top_uart_loopback`) implemented.
+- [x] Phase 5 (`top_fifo_loopback`) implemented, built, and simulated; ready for hardware test.
+- [x] Phase 6 (`top_i2c_codec_probe`) implemented, simulated, and built; ready for hardware codec probe.
 
 ## Getting Started
 
@@ -252,6 +257,10 @@ make prog
 | `top_pwm_rgb` | `rtl/top/top_pwm_rgb.sv` | Phase 2: PWM RGB LED ✅ |
 | `top_switch_modes` | `rtl/top/top_switch_modes.sv` | Phase 3: switch-controlled RGB modes ✅ |
 | `top_uart_loopback` | `rtl/top/top_uart_loopback.sv` | Phase 4: UART loopback ✅ |
+| `top_fifo_loopback` | `rtl/top/top_fifo_loopback.sv` | Phase 5: FIFO loopback ✅ |
+| `fifo_sync` | `rtl/common/fifo_sync.sv` | Parameterized synchronous FIFO |
+| `top_i2c_codec_probe` | `rtl/top/top_i2c_codec_probe.sv` | Phase 6: I2C codec configuration probe ✅ |
+| `i2c_master` | `rtl/common/i2c_master.sv` | Byte-stream open-drain I2C master |
 | `rgb_pattern_gen` | `rtl/common/rgb_pattern_gen.sv` | RGB LED pattern generator |
 | `uart_rx` | `rtl/common/uart_rx.sv` | UART receiver |
 | `uart_tx` | `rtl/common/uart_tx.sv` | UART transmitter |
@@ -262,6 +271,8 @@ make prog
 | `tb_rgb_pattern_gen` | `rtl/tb/tb_rgb_pattern_gen.sv` | Testbench for RGB pattern generator |
 | `tb_uart_rx` | `rtl/tb/tb_uart_rx.sv` | Testbench for UART receiver |
 | `tb_uart_tx` | `rtl/tb/tb_uart_tx.sv` | Testbench for UART transmitter |
+| `tb_fifo_sync` | `rtl/tb/tb_fifo_sync.sv` | Testbench for synchronous FIFO |
+| `tb_i2c_master` | `rtl/tb/tb_i2c_master.sv` | Testbench for the I2C master |
 
 This table will grow as we add phases.
 
