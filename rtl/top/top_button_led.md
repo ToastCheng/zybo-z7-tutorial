@@ -46,6 +46,30 @@ logic [NUM_LEDS-1:0] led_reg = '0;
 
 This sets the power-on value of the register by initializing it in the declaration. It is **synthesizable in FPGAs** because the bitstream configures the initial state of each flip-flop. It is **not synthesizable in ASICs**, where a reset signal is required.
 
+#### `initial` block vs. declaration initialization
+
+You might also see initialization done with an `initial` block:
+
+```systemverilog
+logic led_reg;
+initial begin
+    led_reg = 1'b0;
+end
+```
+
+For simple cases, both forms synthesize to the same FPGA hardware: a flip-flop that starts at `0` after configuration.
+
+However, there are practical differences:
+
+| Approach | Synthesis | Simulation | Recommendation |
+|---|---|---|---|
+| `initial begin x = 0; end` | Power-on init via bitstream | Can conflict with `always_ff` (multi-driver error) | Avoid in reusable RTL |
+| `logic x = 0;` | Power-on init via bitstream | Clean initial value | **Preferred** |
+
+We use declaration initialization because it works cleanly in both synthesis and simulation.
+
+> **Important:** Neither form provides a **runtime reset**. They only set the value at power-on/configuration. If you need to reset the design while it is running, you must add a dedicated reset input.
+
 For this learning board, initialization keeps the design simple. In safety-critical or ASIC designs, you would use a dedicated reset.
 
 ### `generate` Loops
