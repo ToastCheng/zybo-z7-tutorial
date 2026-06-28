@@ -50,7 +50,19 @@ make build TOP=top_uart_loopback
 make prog TOP=top_uart_loopback
 ```
 
-After programming, open a serial terminal (e.g., `picocom`, `minicom`, or PuTTY) connected to your USB-UART adapter at **115200 baud, 8 data bits, no parity, 1 stop bit**. Anything you type should be echoed back, and the lower nibble of the last received byte appears on `LD0`–`LD3`.
+### Option A: USB-UART adapter (full loopback test)
+
+Connect a USB-to-UART adapter to Pmod JE as shown above, open a serial terminal at **115200 baud, 8 data bits, no parity, 1 stop bit** (e.g., `picocom`, `minicom`, or PuTTY), and type. Each character you send should be echoed back, and the lower nibble of the last received byte appears on `LD0`–`LD3`.
+
+### Option B: Jumper-wire self test (no adapter needed)
+
+If you do not have a USB-UART adapter, you can still verify the UART hardware with a single jumper wire:
+
+1. Place a jumper wire between **JE2 (uart_tx)** and **JE1 (uart_rx)** on Pmod JE.
+2. Slide **SW0 to the ON position**.
+3. The FPGA now transmits an incrementing byte roughly every 0.5 s. Because TX and RX are shorted, the same byte is received back and its lower nibble is shown on `LD0`–`LD3`.
+
+You should see the LEDs counting slowly. This proves the transmitter, receiver, and loopback path are all working without any external cable.
 
 ## Exercises
 

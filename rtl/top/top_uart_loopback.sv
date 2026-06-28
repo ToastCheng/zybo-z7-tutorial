@@ -37,6 +37,18 @@ module top_uart_loopback (
     logic [7:0] pending_data = '0;
     logic       pending      = 1'b0;
 
+    // Self-test generator. If sw[0] is high and no external byte is waiting,
+    // the FPGA periodically sends an incrementing test byte.  With JE1 and
+    // JE2 shorted, this byte is received back and shown on the LEDs.
+    logic [31:0] test_counter = '0;
+    logic [7:0]  test_byte    = '0;
+
+    always_ff @(posedge clk) begin
+        test_counter <= test_counter + 1'b1;
+    end
+
+    wire logic test_tick = (test_counter[25:0] == '0);
+
     uart_rx #(
         .CLK_FREQ_HZ(CLK_FREQ_HZ),
         .BAUD_RATE  (BAUD_RATE)
@@ -62,6 +74,10 @@ module top_uart_loopback (
         if (rx_valid && !pending) begin
             pending_data <= rx_data;
             pending      <= 1'b1;
+        end else if (sw[0] && !pending && !tx_busy && test_tick) begin
+            pending_data <= test_byte;
+            pending      <= 1'b1;
+            test_byte    <= test_byte + 1'b1;
         end
 
         if (pending && !tx_busy) begin
