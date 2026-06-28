@@ -24,6 +24,15 @@ module uart_rx #(
     localparam int HALF_BIT      = TICKS_PER_BIT / 2;
     localparam int TIMER_WIDTH   = $clog2(TICKS_PER_BIT);
 
+    // Synchronize the asynchronous serial input into the clock domain.
+    logic rx_sync;
+
+    sync rx_synchronizer (
+        .clk  (clk),
+        .din  (rx),
+        .dout (rx_sync)
+    );
+
     typedef enum logic [1:0] {
         IDLE,
         START,
@@ -43,7 +52,7 @@ module uart_rx #(
 
         case (state)
             IDLE: begin
-                if (rx == 1'b0) begin
+                if (rx_sync == 1'b0) begin
                     // Falling edge: wait half a bit period to sample the
                     // center of the start bit.
                     timer <= TIMER_WIDTH'(HALF_BIT);
@@ -55,7 +64,7 @@ module uart_rx #(
                 if (timer == '0) begin
                     // Center of the start bit. If it is still low, this is a
                     // real start bit; otherwise it was a glitch.
-                    if (rx == 1'b0) begin
+                    if (rx_sync == 1'b0) begin
                         state      <= DATA;
                         bit_index  <= 3'd0;
                         timer      <= TIMER_WIDTH'(TICKS_PER_BIT - 1);
@@ -70,7 +79,7 @@ module uart_rx #(
             DATA: begin
                 if (timer == '0) begin
                     // Sample the current data bit at its center.
-                    shift_reg[bit_index] <= rx;
+                    shift_reg[bit_index] <= rx_sync;
                     timer <= TIMER_WIDTH'(TICKS_PER_BIT - 1);
 
                     if (bit_index == 3'd7) begin

@@ -48,5 +48,5 @@ set_property -dict { PACKAGE_PIN M17 IOSTANDARD LVCMOS33 } [get_ports { rgb_led[
 #   JE1 (V12) = uart_rx   (FPGA input from host TX)
 #   JE2 (W16) = uart_tx   (FPGA output to host RX)
 #------------------------------------------------------------------------------
-set_property -dict { PACKAGE_PIN V12 IOSTANDARD LVCMOS33 } [get_ports { uart_rx }];
+set_property -dict { PACKAGE_PIN V12 IOSTANDARD LVCMOS33 PULLUP true } [get_ports { uart_rx }];
 set_property -dict { PACKAGE_PIN W16 IOSTANDARD LVCMOS33 } [get_ports { uart_tx }];

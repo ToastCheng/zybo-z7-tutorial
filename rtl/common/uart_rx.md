@@ -6,9 +6,13 @@ Receive an 8-bit byte from a UART serial line using the standard **8-N-1** forma
 
 ## Concepts
 
+### Input synchronization
+
+The `rx` pin is asynchronous to the system clock, so it is first passed through a 2-stage synchronizer. This reduces the chance of metastability and also filters very short noise spikes.
+
 ### Start-bit detection
 
-The receiver waits for the serial line to fall from idle (`1`) to `0`. That falling edge is the beginning of the start bit.
+The receiver waits for the synchronized serial line to fall from idle (`1`) to `0`. That falling edge is the beginning of the start bit.
 
 ### Sampling at bit centers
 
