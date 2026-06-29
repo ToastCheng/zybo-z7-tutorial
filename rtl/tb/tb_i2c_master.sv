@@ -159,31 +159,37 @@ module tb_i2c_master;
 
         // Transaction: device address + W, then two payload bytes.
         // 16'h0C10 = write 0x010 to register 6 of the SSM2603.
+        // Use single-cycle command strobes; the master latches and runs.
         cmd_start <= 1'b1;
-        wait_done();
+        @(posedge clk);
         cmd_start <= 1'b0;
+        wait_done();
 
         tx_data   <= 8'h34;
         cmd_write <= 1'b1;
-        wait_done();
+        @(posedge clk);
         cmd_write <= 1'b0;
+        wait_done();
         if (!ack) $error("Expected ACK for device address");
 
         tx_data   <= 8'h0C;
         cmd_write <= 1'b1;
-        wait_done();
+        @(posedge clk);
         cmd_write <= 1'b0;
+        wait_done();
         if (!ack) $error("Expected ACK for payload high byte");
 
         tx_data   <= 8'h10;
         cmd_write <= 1'b1;
-        wait_done();
+        @(posedge clk);
         cmd_write <= 1'b0;
+        wait_done();
         if (!ack) $error("Expected ACK for payload low byte");
 
         cmd_stop <= 1'b1;
-        wait_done();
+        @(posedge clk);
         cmd_stop <= 1'b0;
+        wait_done();
 
         // Allow the slave to settle and detect the stop.
         repeat (10) @(posedge clk);

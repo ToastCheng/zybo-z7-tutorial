@@ -26,11 +26,13 @@ Instead of a high-level register interface, the master exposes one command at a 
 | WRITE   | `cmd_write` | Transmit `tx_data` and sample the slave ACK bit. |
 | STOP    | `cmd_stop`  | Generate a STOP condition (SDA rises while SCL is high). |
 
+The command strobes are **single-cycle pulses**.  An internal latch captures each pulse and holds the request until the bit timer accepts it in the IDLE state, so the caller does not need to align the pulse with the I²C half-period.
+
 `busy` is high while a command runs and `done` pulses for one cycle when it finishes. After a WRITE, `ack` reflects the slave's ACK bit (`1` = ACK, `0` = NACK).
 
 ### Bit timing
 
-A programmable timer divides `CLK_FREQ_HZ` down to `I2C_FREQ_HZ`. Each I²C bit uses a half-period counter so that SDA changes while SCL is low and is sampled while SCL is high.
+A programmable timer divides `CLK_FREQ_HZ` down to `I2C_FREQ_HZ`. Each I²C bit uses a half-period counter so that SDA changes while SCL is low and is sampled while SCL is high.  The slave ACK bit is sampled in the middle of the SCL high period to tolerate input delays and slave response time.
 
 ## Parameters
 

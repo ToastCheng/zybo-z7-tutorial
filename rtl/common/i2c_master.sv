@@ -45,6 +45,7 @@ module i2c_master #(
         WRITE_SCL_LOW,
         ACK_SETUP,
         ACK_HIGH,
+        ACK_SAMPLE,
         ACK_LOW,
         STOP_P1,
         STOP_P2,
@@ -61,6 +62,12 @@ module i2c_master #(
     logic                   scl_val;
     logic                   sda_val;
 
+    // Command latch: the caller can use single-cycle strobes.  A request is
+    // captured on the strobe and held until the FSM accepts it in IDLE.
+    logic start_req = 1'b0;
+    logic write_req = 1'b0;
+    logic stop_req  = 1'b0;
+
     assign half_tick = (timer == TIMER_WIDTH'(HALF_PERIOD - 1));
     assign scl_oe    = ~scl_val;      // drive low when scl_val == 0
     assign sda_oe    = ~sda_val;      // drive low when sda_val == 0
@@ -74,6 +81,25 @@ module i2c_master #(
             timer <= '0;
         end else begin
             timer <= timer + 1'b1;
+        end
+    end
+
+    // Capture single-cycle command strobes.
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            start_req <= 1'b0;
+            write_req <= 1'b0;
+            stop_req  <= 1'b0;
+        end else begin
+            if (cmd_start && !start_req) start_req <= 1'b1;
+            if (cmd_write && !write_req) write_req <= 1'b1;
+            if (cmd_stop  && !stop_req)  stop_req  <= 1'b1;
+
+            if (half_tick && state == IDLE) begin
+                if (start_req) start_req <= 1'b0;
+                if (write_req) write_req <= 1'b0;
+                if (stop_req)  stop_req  <= 1'b0;
+            end
         end
     end
 
@@ -94,15 +120,15 @@ module i2c_master #(
                     IDLE: begin
                         busy    <= 1'b0;
 
-                        if (cmd_start) begin
+                        if (start_req) begin
                             state <= START_SDA_LOW;
                             busy  <= 1'b1;
-                        end else if (cmd_write) begin
+                        end else if (write_req) begin
                             state   <= WRITE_SETUP;
                             busy    <= 1'b1;
                             bit_cnt <= 3'd7;
                             ack_reg <= 1'b0;
-                        end else if (cmd_stop) begin
+                        end else if (stop_req) begin
                             state <= STOP_P1;
                             busy  <= 1'b1;
                         end
@@ -149,6 +175,10 @@ module i2c_master #(
 
                     ACK_HIGH: begin
                         scl_val <= 1'b1;
+                        state   <= ACK_SAMPLE;
+                    end
+
+                    ACK_SAMPLE: begin
                         ack_reg <= ~sda_i;   // low SDA from slave = ACK
                         state   <= ACK_LOW;
                     end
