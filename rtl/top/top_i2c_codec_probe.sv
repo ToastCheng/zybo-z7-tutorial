@@ -4,10 +4,14 @@
 // top_i2c_codec_probe.sv
 // Phase 6: I2C master probe of the on-board SSM2603 audio codec.
 //
-// Pressing BTN1 sends one register-write from a configuration lookup table to
-// the codec over I2C.  LD0-LD3 show the current step in the sequence.  If all
-// writes are acknowledged, the RGB LED turns green; if any byte is NACKed, it
-// turns red.  BTN0 resets the sequencer.
+// Toggling SW0 sends the next register-write from the configuration lookup
+// table to the codec over I2C.  LD0-LD3 show the current step in the sequence.
+// The RGB LED indicates status:
+//   red   = busy (a transaction is in progress)
+//   green = done (all registers have been configured successfully)
+//   blue  = error (the codec did not acknowledge a byte)
+//   off   = idle (waiting for SW0)
+// BTN0 resets the sequencer.
 //------------------------------------------------------------------------------
 
 `include "rtl/pkg/board_pkg.sv"
@@ -46,9 +50,10 @@ module top_i2c_codec_probe (
 
     localparam logic [7:0] I2C_DEVICE_ADDR_W = 8'h34;  // 0x1A << 1 | W
 
-    // Button handling.
-    logic db_btn0, db_btn1;
-    logic next_step;
+    // Reset and trigger handling.
+    logic db_btn0;
+    logic sw0_sync;
+    logic sw0_rising;
 
     debounce db0 (
         .clk  (clk),
@@ -56,16 +61,16 @@ module top_i2c_codec_probe (
         .dout (db_btn0)
     );
 
-    debounce db1 (
+    sync sync_sw0 (
         .clk  (clk),
-        .din  (btn[1]),
-        .dout (db_btn1)
+        .din  (sw[0]),
+        .dout (sw0_sync)
     );
 
-    edge_detect ed1 (
+    edge_detect ed_sw0 (
         .clk     (clk),
-        .din     (db_btn1),
-        .rising  (next_step),
+        .din     (sw0_sync),
+        .rising  (sw0_rising),
         .falling ()
     );
 
@@ -124,11 +129,11 @@ module top_i2c_codec_probe (
 
     always_ff @(posedge clk) begin
         if (db_btn0) begin
-            state       <= S_IDLE;
-            step        <= '0;
-            error_reg   <= 1'b0;
-            done_all    <= 1'b0;
-            ack_ok      <= 1'b1;
+            state         <= S_IDLE;
+            step          <= '0;
+            error_reg     <= 1'b0;
+            done_all      <= 1'b0;
+            ack_ok        <= 1'b1;
             i2c_cmd_start <= 1'b0;
             i2c_cmd_stop  <= 1'b0;
             i2c_cmd_write <= 1'b0;
@@ -141,7 +146,7 @@ module top_i2c_codec_probe (
             case (state)
                 S_IDLE: begin
                     ack_ok <= 1'b1;
-                    if (next_step && !done_all && !error_reg) begin
+                    if (sw0_rising && !done_all && !error_reg) begin
                         state <= S_START;
                     end
                 end
@@ -196,7 +201,7 @@ module top_i2c_codec_probe (
                 S_WAIT_STOP: if (i2c_done) begin
                     if (ack_ok) begin
                         if (step < LUT_SIZE-1) begin
-                            step <= step + 1'b1;
+                            step  <= step + 1'b1;
                             state <= S_IDLE;
                         end else begin
                             step     <= step + 1'b1;
@@ -221,17 +226,24 @@ module top_i2c_codec_probe (
     // Visual feedback.
     assign led = step[3:0];
 
+    logic busy;
+    assign busy = (state != S_IDLE) && (state != S_ERROR);
+
     logic pwm_out;
     pwm #(
         .N(8)
     ) pwm_dimmer (
         .clk     (clk),
-        .duty    (8'd1),
+        .duty    (8'd2),
         .pwm_out (pwm_out)
     );
 
     logic [2:0] rgb_raw;
-    assign rgb_raw = error_reg ? 3'b100 : done_all ? 3'b010 : 3'b001;
+    // rgb_led[2]=R, [1]=G, [0]=B
+    assign rgb_raw = error_reg ? 3'b001 :
+                     done_all  ? 3'b010 :
+                     busy      ? 3'b100 :
+                                 3'b000;
     assign rgb_led = rgb_raw & {3{pwm_out}};
 
     // Unused ports.
