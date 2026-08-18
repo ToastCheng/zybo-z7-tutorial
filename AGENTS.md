@@ -30,6 +30,13 @@ This file contains project-specific conventions and workflow preferences for any
 - Simulate a testbench: `make sim TB=<testbench_module_name>`
 - Clean generated files: `make clean`
 
+### SoC (PS + PL) designs — Phase 9 onward
+
+- Build the block design, bitstream, and XSA: `make build_soc SOC_TOP=<soc_top_module_name>`
+- Build the bare-metal PS application: `make app`
+- Program the PL and run the PS app over JTAG: `make run_soc`
+- SoC application sources live in `vitis/<app_name>/`; generated Vitis workspace files go to `build/vitis_ws/` (ignored by git).
+
 ## Testing on Hardware
 
 - The Zybo Z7-10 board is connected to the host via the PROG/UART micro-USB port.

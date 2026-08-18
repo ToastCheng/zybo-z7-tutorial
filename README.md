@@ -128,6 +128,14 @@ We use **Xilinx Vivado** for synthesis, implementation, and bitstream generation
 | Run simulation | `make sim` |
 | Clean artifacts | `make clean` |
 
+From Phase 9 onward there are also **SoC targets** that include the ARM PS:
+
+| Step | Command |
+|------|---------|
+| Build PS+PL block design, bitstream, and XSA | `make build_soc` |
+| Build the bare-metal PS application (Vitis) | `make app` |
+| Program PL and run the PS app via JTAG | `make run_soc` |
+
 The Vivado GUI is useful only for:
 
 - Viewing the synthesized schematic.
@@ -165,6 +173,7 @@ We build the project in small, self-contained phases. Each phase adds one new co
 | 6 | I2C Master | Configure the on-board audio codec | `top_i2c_codec_probe` ✅ |
 | 7 | I2S Controller | Digital audio streaming | `top_i2s_tone` ✅ |
 | 8 | Audio Loopback / Tone | I2C + I2S together: line-in → headphones or generated tone | `top_audio_loopback` |
+| 9 | PS Hello | First use of the ARM PS: bare-metal app, EMIO GPIO, UART | `top_ps_hello` ✅ |
 
 Each phase has:
 
@@ -222,6 +231,7 @@ Every module contains a `README.md` with these sections:
 - [x] Phase 6 (`top_i2c_codec_probe`) implemented, simulated, and built; ready for hardware codec probe.
 - [x] Phase 7 (`top_i2s_tone`) implemented, simulated, and built; ready for hardware audio test.
 - [x] Phase 8 (`top_audio_loopback`) implemented, simulated, and built; ready for hardware loopback/tone test.
+- [x] Phase 9 (`top_ps_hello`) implemented and built; first PS phase (bare-metal app over UART), ready for hardware test.
 
 ## Getting Started
 
@@ -286,6 +296,7 @@ make prog
 | `tb_i2s_rx` | `rtl/tb/tb_i2s_rx.sv` | Unit testbench for the I2S receiver |
 | `tb_top_audio_loopback` | `rtl/tb/tb_top_audio_loopback.sv` | Integration testbench for audio loopback / tone |
 | `top_audio_loopback` | `rtl/top/top_audio_loopback.sv` | Phase 8: audio loopback or generated tone |
+| `top_ps_hello` | `rtl/top/top_ps_hello.sv` | Phase 9: PS bring-up (EMIO GPIO button → UART hello) ✅ |
 
 This table will grow as we add phases.
 
