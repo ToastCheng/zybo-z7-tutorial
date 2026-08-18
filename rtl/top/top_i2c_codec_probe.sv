@@ -80,7 +80,7 @@ module top_i2c_codec_probe (
     logic i2c_busy, i2c_done, i2c_ack;
     logic scl_oe, sda_oe;
 
-    i2c_master #(
+    i2c_master_wo #(
         .CLK_FREQ_HZ(CLK_FREQ_HZ),
         .I2C_FREQ_HZ(100_000)
     ) i2c (
