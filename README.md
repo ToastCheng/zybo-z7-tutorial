@@ -163,7 +163,7 @@ We build the project in small, self-contained phases. Each phase adds one new co
 | 4 | UART Loopback | Serial communication | `top_uart_loopback` ✅ |
 | 5 | FIFO | On-chip buffering and flow control | `top_fifo_loopback` ✅ |
 | 6 | I2C Master | Configure the on-board audio codec | `top_i2c_codec_probe` ✅ |
-| 7 | I2S Controller | Digital audio streaming | `top_i2s_tone` |
+| 7 | I2S Controller | Digital audio streaming | `top_i2s_tone` ✅ |
 | 8 | Audio Loopback / Tone | I2C + I2S together: line-in → headphones or generated tone | `top_audio_loopback` |
 
 Each phase has:
@@ -220,6 +220,8 @@ Every module contains a `README.md` with these sections:
 - [x] Phase 4 (`top_uart_loopback`) implemented.
 - [x] Phase 5 (`top_fifo_loopback`) implemented, built, and simulated; ready for hardware test.
 - [x] Phase 6 (`top_i2c_codec_probe`) implemented, simulated, and built; ready for hardware codec probe.
+- [x] Phase 7 (`top_i2s_tone`) implemented, simulated, and built; ready for hardware audio test.
+- [x] Phase 8 (`top_audio_loopback`) implemented, simulated, and built; ready for hardware loopback/tone test.
 
 ## Getting Started
 
@@ -260,7 +262,13 @@ make prog
 | `top_fifo_loopback` | `rtl/top/top_fifo_loopback.sv` | Phase 5: FIFO loopback ✅ |
 | `fifo_sync` | `rtl/common/fifo_sync.sv` | Parameterized synchronous FIFO |
 | `top_i2c_codec_probe` | `rtl/top/top_i2c_codec_probe.sv` | Phase 6: I2C codec configuration probe ✅ |
+| `top_i2s_tone` | `rtl/top/top_i2s_tone.sv` | Phase 7: I2S tone generator ✅ |
 | `i2c_master` | `rtl/common/i2c_master.sv` | Byte-stream open-drain I2C master |
+| `i2c_master_wo` | `rtl/common/i2c_master_wo.sv` | I2C master that only writes (no read-back) |
+| `i2s_tx` | `rtl/common/i2s_tx.sv` | I2S transmit serializer |
+| `i2s_rx` | `rtl/common/i2s_rx.sv` | I2S receive deserializer |
+| `tone_generator` | `rtl/common/tone_generator.sv` | DDS sine-wave tone generator |
+| `audio_clock_gen` | `rtl/common/audio_clock_gen.sv` | Codec master clock generator (MMCM) |
 | `rgb_pattern_gen` | `rtl/common/rgb_pattern_gen.sv` | RGB LED pattern generator |
 | `uart_rx` | `rtl/common/uart_rx.sv` | UART receiver |
 | `uart_tx` | `rtl/common/uart_tx.sv` | UART transmitter |
@@ -273,6 +281,11 @@ make prog
 | `tb_uart_tx` | `rtl/tb/tb_uart_tx.sv` | Testbench for UART transmitter |
 | `tb_fifo_sync` | `rtl/tb/tb_fifo_sync.sv` | Testbench for synchronous FIFO |
 | `tb_i2c_master` | `rtl/tb/tb_i2c_master.sv` | Testbench for the I2C master |
+| `tb_i2c_master_wo` | `rtl/tb/tb_i2c_master_wo.sv` | Testbench for the write-only I2C master |
+| `tb_top_i2s_tone` | `rtl/tb/tb_top_i2s_tone.sv` | Integration testbench for I2S tone generator |
+| `tb_i2s_rx` | `rtl/tb/tb_i2s_rx.sv` | Unit testbench for the I2S receiver |
+| `tb_top_audio_loopback` | `rtl/tb/tb_top_audio_loopback.sv` | Integration testbench for audio loopback / tone |
+| `top_audio_loopback` | `rtl/top/top_audio_loopback.sv` | Phase 8: audio loopback or generated tone |
 
 This table will grow as we add phases.
 
