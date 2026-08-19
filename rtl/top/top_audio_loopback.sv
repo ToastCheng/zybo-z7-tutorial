@@ -6,7 +6,7 @@
 //
 // After reset the FPGA configures the SSM2603 codec over I2C for I2S 16-bit
 // slave mode at 44.1 kHz.  SW0 selects the audio source:
-//   SW0 = 0 : line-in -> FPGA -> headphones (digital loopback)
+//   SW0 = 0 : mic-in -> FPGA -> headphones (digital loopback)
 //   SW0 = 1 : internally generated 1 kHz sine tone
 //
 // RGB LED status:
@@ -51,7 +51,7 @@ module top_audio_loopback #(
         16'h0217,  // R1: right line in, 0 dB
         16'h0479,  // R2: left headphone, 0 dB
         16'h0679,  // R3: right headphone, 0 dB
-        16'h08D4,  // R4: analog audio path (DAC enabled)
+        16'h0815,  // R4: analog audio path (DAC on, mic input, +20 dB boost)
         16'h0A04,  // R5: digital audio path
         16'h0E02,  // R7: digital audio interface, I2S 16-bit, codec slave
         16'h1020,  // R8: sampling rate, 44.1 kHz normal mode

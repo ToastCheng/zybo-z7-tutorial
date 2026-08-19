@@ -172,7 +172,7 @@ We build the project in small, self-contained phases. Each phase adds one new co
 | 5 | FIFO | On-chip buffering and flow control | `top_fifo_loopback` ✅ |
 | 6 | I2C Master | Configure the on-board audio codec | `top_i2c_codec_probe` ✅ |
 | 7 | I2S Controller | Digital audio streaming | `top_i2s_tone` ✅ |
-| 8 | Audio Loopback / Tone | I2C + I2S together: line-in → headphones or generated tone | `top_audio_loopback` ✅ |
+| 8 | Audio Loopback / Tone | I2C + I2S together: mic-in → headphones or generated tone | `top_audio_loopback` ✅ |
 | 9 | PS Hello | First use of the ARM PS: bare-metal app, EMIO GPIO, UART | `top_ps_hello` ✅ |
 
 Each phase has:

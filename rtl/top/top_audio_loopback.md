@@ -6,7 +6,7 @@ Combine the Phase 6 (I²C) and Phase 7 (I²S) blocks into a complete audio
 path. After reset, the FPGA configures the on-board **SSM2603 codec** over
 I²C, then streams digital audio over I²S. **SW0** selects the source:
 
-- **SW0 = 0** — digital loopback: line-in → ADC → FPGA → DAC → headphones.
+- **SW0 = 0** — digital loopback: mic-in → ADC → FPGA → DAC → headphones.
 - **SW0 = 1** — an internally generated 1 kHz sine tone → headphones.
 
 ## What You Should See (and Hear)
@@ -15,7 +15,9 @@ I²C, then streams digital audio over I²S. **SW0** selects the source:
   then pulses **green** (audio running). **Blue** means the codec did not
   acknowledge a byte (error).
 - With SW0 = 1 and headphones connected, you hear a steady 1 kHz tone.
-- With SW0 = 0 and an audio source on line-in, you hear it on the headphones.
+- With SW0 = 0 and a microphone in the **mic jack**, you hear it on the
+  headphones. The board also has a separate stereo **line-in** jack — see
+  "Mic vs. line input" below.
 - `led[3:0]` mirrors the four slide switches.
 
 ## Concepts
@@ -61,6 +63,20 @@ Notable register values:
 - `16'h1020` — R8: sample rate = **44.1 kHz** (with the ~11.29 MHz MCLK).
 - `16'h1201` — R9: last step, activate the digital core.
 
+### Mic vs. line input
+
+The board has **two separate input jacks** wired to different codec pins: a
+mono **microphone** jack (MICIN, with mic bias) and a stereo **line-in** jack
+(L/RLINEIN). Register R4 selects which one reaches the ADC:
+
+- Our configuration (`16'h0815`) sets **INSEL = 1** (mic) and
+  **MICBOOST = 1** (+20 dB), because a microphone outputs only a few
+  millivolts.
+- A microphone plugged into the **line-in** jack is ~40 dB too quiet to hear
+  — line level is around 1 Vrms. To use a line-level source (phone, PC audio
+  out) instead, change R4 to select line-in: `16'h0810` (INSEL = 0, DAC
+  enabled, no mic boost).
+
 ### Loopback vs. tone mux
 
 The transmit samples are just a combinational select:
@@ -92,7 +108,7 @@ raises `sample_req`.
                 MCLK domain (~11.29 MHz) ▲
  ┌────────────────────────────────────────┴─────┐
  │ audio_clock_gen (MMCM) ──► ac_mclk           │
- │ line-in ─► i2s_rx ─►┐                        │
+ │ mic-in ───► i2s_rx ─►┐                        │
  │                     ├─ mux (SW0) ─► i2s_tx ─►│─► headphones
  │ tone_generator ────►┘      (1 kHz)           │
  └──────────────────────────────────────────────┘
@@ -152,14 +168,14 @@ make build TOP=top_audio_loopback
 make prog TOP=top_audio_loopback
 ```
 
-Hardware setup: connect headphones to the **headphone out** jack (and
-optionally an audio source to **line-in**).
+Hardware setup: connect headphones to the **headphone out** jack and a
+microphone to the **mic** jack (mono, next to line-in).
 
 1. After programming, the RGB LED should go red → green within a second.
    Blue means the codec did not respond (check the board/jumpers, then press
    BTN0 to retry).
 2. Set **SW0 = 1**: steady 1 kHz tone in the headphones.
-3. Set **SW0 = 0** with a source playing on line-in: loopback audio.
+3. Set **SW0 = 0** and speak into the microphone: loopback audio.
 4. Press **BTN0** at any time to reset and re-run the codec configuration.
 
 ### Simulation
