@@ -174,6 +174,7 @@ We build the project in small, self-contained phases. Each phase adds one new co
 | 7 | I2S Controller | Digital audio streaming | `top_i2s_tone` ✅ |
 | 8 | Audio Loopback / Tone | I2C + I2S together: mic-in → headphones or generated tone | `top_audio_loopback` ✅ |
 | 9 | PS Hello | First use of the ARM PS: bare-metal app, EMIO GPIO, UART | `top_ps_hello` ✅ |
+| 10 | Audio Effects | BRAM delay line, saturation, bit manipulation | `top_audio_fx` ✅ |
 
 Each phase has:
 
@@ -232,6 +233,7 @@ Every module contains a `README.md` with these sections:
 - [x] Phase 7 (`top_i2s_tone`) implemented, simulated, and built; ready for hardware audio test.
 - [x] Phase 8 (`top_audio_loopback`) implemented, simulated, and built; ready for hardware loopback/tone test.
 - [x] Phase 9 (`top_ps_hello`) implemented and built; first PS phase (bare-metal app over UART), ready for hardware test.
+- [x] Phase 10 (`top_audio_fx`) implemented, simulated, built, and programmed; ready for hardware listening test.
 
 ## Getting Started
 
@@ -296,6 +298,12 @@ make prog
 | `tb_i2s_rx` | `rtl/tb/tb_i2s_rx.sv` | Unit testbench for the I2S receiver |
 | `tb_top_audio_loopback` | `rtl/tb/tb_top_audio_loopback.sv` | Integration testbench for audio loopback / tone |
 | `top_audio_loopback` | `rtl/top/top_audio_loopback.sv` | Phase 8: audio loopback or generated tone |
+| `audio_fx_bitcrusher` | `rtl/common/audio_fx_bitcrusher.sv` | Lo-fi bit-crusher effect |
+| `audio_fx_distortion` | `rtl/common/audio_fx_distortion.sv` | Gain + hard-clip distortion effect |
+| `audio_fx_echo` | `rtl/common/audio_fx_echo.sv` | BRAM delay-line echo effect |
+| `tb_audio_fx` | `rtl/tb/tb_audio_fx.sv` | Unit testbench for the audio effects |
+| `tb_top_audio_fx` | `rtl/tb/tb_top_audio_fx.sv` | Integration testbench for the audio effects chain |
+| `top_audio_fx` | `rtl/top/top_audio_fx.sv` | Phase 10: switch-controlled live sound effects ✅ |
 | `top_ps_hello` | `rtl/top/top_ps_hello.sv` | Phase 9: PS bring-up (EMIO GPIO button → UART hello) ✅ |
 
 This table will grow as we add phases.
