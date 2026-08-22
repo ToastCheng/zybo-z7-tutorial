@@ -77,6 +77,12 @@ mono **microphone** jack (MICIN, with mic bias) and a stereo **line-in** jack
   out) instead, change R4 to select line-in: `16'h0810` (INSEL = 0, DAC
   enabled, no mic boost).
 
+**TRS vs. TRRS plugs:** the mic jack expects a **TRS** plug (2 insulating
+rings; tip = mic, ring = bias, sleeve = ground). Headset mics often have a
+**TRRS** plug (3 rings, CTIA pinout) whose ground ring lands where the jack
+expects mic signal and bias — the mic is then unbiased and shorted to
+ground, i.e. silent. Use a TRRS→TRS adapter, as with most PC sound cards.
+
 ### Loopback vs. tone mux
 
 The transmit samples are just a combinational select:
