@@ -1,4 +1,4 @@
-# Zybo Z7-10 FPGA & SoC Learning Lab
+# Zybo Z7-10 FPGA GUI-free Demos
 
 A modular, beginner-friendly FPGA project for the **Digilent Zybo Z7-10** board.
 
@@ -8,19 +8,53 @@ The goal is to learn digital design hands-on, starting from a blinking LED and b
 
 ## Table of Contents
 
-1. [Project Goals](#project-goals)
-2. [Why the Command Line?](#why-the-command-line)
-3. [Board Overview: Zybo Z7-10](#board-overview-zybo-z7-10)
-4. [Repository Structure](#repository-structure)
-5. [Toolchain & Workflow](#toolchain--workflow)
+1. [Getting Started](#getting-started)
+2. [Project Goals](#project-goals)
+3. [Why the Command Line?](#why-the-command-line)
+4. [Board Overview: Zybo Z7-10](#board-overview-zybo-z7-10)
+5. [Repository Structure](#repository-structure)
+6. [Toolchain & Workflow](#toolchain--workflow)
    - [Do I Need an IDE or GUI?](#do-i-need-an-ide-or-gui)
    - [Command-Line Workflow](#command-line-workflow)
-6. [Learning Roadmap](#learning-roadmap)
-7. [How to Read the Educational Material](#how-to-read-the-educational-material)
-8. [Prerequisites](#prerequisites)
-9. [Getting Started](#getting-started)
-10. [Module Index](#module-index)
-11. [References](#references)
+7. [Modules](#modules)
+8. [How to Read the Educational Material](#how-to-read-the-educational-material)
+9. [Prerequisites](#prerequisites)
+10. [References](#references)
+
+---
+
+## Getting Started
+
+1. Clone this repository.
+2. Connect the Zybo Z7-10 to your computer via the **PROG/UART** micro-USB port.
+3. Set the board power switch to **USB** if you are powering from USB.
+4. Run the first build:
+
+```bash
+make build TOP=top_hello
+```
+
+5. Program the FPGA:
+
+```bash
+make prog
+```
+
+6. Observe the LEDs. If the build succeeded, you should see the expected LED behavior for the current phase.
+
+> The first build may take a few minutes because Vivado is synthesizing and implementing the design. Later builds are faster if you only change HDL.
+
+### Trying the SoC Demo (Phase 9)
+
+The PS + PL flow is three commands — still no GUI:
+
+```bash
+make build_soc SOC_TOP=top_ps_hello   # block design + bitstream + XSA (Vivado batch Tcl)
+make app                              # compile the bare-metal C app (Vitis Python API)
+make run_soc                          # program PL, run the app, print over UART (xsct)
+```
+
+Open a serial terminal on the board's USB-UART (115200 baud) and press BTN0 to see the hello message.
 
 ---
 
@@ -112,7 +146,7 @@ zybo_z7_fpga/
 └── README.md             # This file
 ```
 
-### Directory Meaning for Beginners
+### Directories
 
 | Directory | Purpose |
 |-----------|---------|
@@ -130,7 +164,7 @@ zybo_z7_fpga/
 
 ## Toolchain & Workflow
 
-We use **AMD Vivado** for synthesis, implementation, and bitstream generation, and **AMD Vitis** for the bare-metal PS applications (Phase 9 onward). Both are driven entirely from the command line.
+We use **AMD Vivado** for synthesis, implementation, and bitstream generation, and **AMD Vitis** for the bare-metal PS applications. Both are driven entirely from the command line.
 
 ### Do I Need an IDE or GUI?
 
@@ -177,36 +211,35 @@ Our `Makefile` wraps these commands so you do not need to remember them.
 
 ---
 
-## Learning Roadmap
+## Modules
 
-We build the project in small, self-contained phases. Each phase adds one new concept and produces a working bitstream.
+The project is built in small, self-contained phases. Each phase adds one new concept and produces a working bitstream.
 
 | Phase | Name | Concept | Top Module |
 |-------|------|---------|------------|
 | 0 | Hello LED | Toolchain + blinking LED | `top_hello` |
-| 1 | Button-Controlled LED | Synchronization, debounce, edge detection | `top_button_led` ✅ |
-| 2 | PWM RGB LED | Pulse-width modulation, parameters | `top_pwm_rgb` ✅ |
-| 3 | Switch Modes | Multiplexers, pattern generators | `top_switch_modes` ✅ |
-| 4 | UART Loopback | Serial communication | `top_uart_loopback` ✅ |
-| 5 | FIFO | On-chip buffering and flow control | `top_fifo_loopback` ✅ |
-| 6 | I2C Master | Configure the on-board audio codec | `top_i2c_codec_probe` ✅ |
-| 7 | I2S Controller | Digital audio streaming | `top_i2s_tone` ✅ |
-| 8 | Audio Loopback / Tone | I2C + I2S together: mic-in → headphones or generated tone | `top_audio_loopback` ✅ |
-| 9 | PS Hello | First use of the ARM PS: bare-metal app, EMIO GPIO, UART | `top_ps_hello` ✅ |
-| 10 | Audio Effects | BRAM delay line, saturation, bit manipulation | `top_audio_fx` ✅ |
+| 1 | Button-Controlled LED | Synchronization, debounce, edge detection | `top_button_led` |
+| 2 | PWM RGB LED | Pulse-width modulation, parameters | `top_pwm_rgb` |
+| 3 | Switch Modes | Multiplexers, pattern generators | `top_switch_modes` |
+| 4 | UART Loopback | Serial communication | `top_uart_loopback` |
+| 5 | FIFO | On-chip buffering and flow control | `top_fifo_loopback` |
+| 6 | I2C Master | Configure the on-board audio codec | `top_i2c_codec_probe` |
+| 7 | I2S Controller | Digital audio streaming | `top_i2s_tone` |
+| 8 | Audio Loopback / Tone | I2C + I2S together: mic-in → headphones or generated tone | `top_audio_loopback` |
+| 9 | PS Hello | First use of the ARM PS: bare-metal app, EMIO GPIO, UART | `top_ps_hello` |
+| 10 | Audio Effects | BRAM delay line, saturation, bit manipulation | `top_audio_fx` |
 
 Each phase has:
 
 - A top-level module in `rtl/top/`
 - Reusable common blocks added to `rtl/common/`
-- A section in this README
-- Its own `README.md` explaining the theory, code, and how to test it
+- A companion `.md` doc next to each source file explaining the theory, code, and how to test it
 
 ---
 
 ## How to Read the Educational Material
 
-Every module contains a `README.md` with these sections:
+Every module has a companion `.md` file next to its source (e.g. `rtl/common/debounce.md` for `rtl/common/debounce.sv`) with these sections:
 
 1. **Goal** — What this module does.
 2. **Concepts** — The digital-design ideas you will learn.
@@ -236,109 +269,6 @@ Every module contains a `README.md` with these sections:
 3. **Knowledge**
    - Basic digital logic: AND, OR, NOT, flip-flops, clocks.
    - Some programming experience is helpful but not required.
-
----
-
-## Current Status
-
-- [x] Git repository initialized with `.gitignore` and agent guidelines.
-- [x] Phase 0 (`top_hello`) implemented, built, and programmed on hardware.
-- [x] Phase 1 (`top_button_led`) implemented, built, and programmed on hardware.
-- [x] Testbenches added for `sync`, `debounce`, and `edge_detect`.
-- [x] Phase 2 (`top_pwm_rgb`) implemented.
-- [x] Phase 3 (`top_switch_modes`) implemented.
-- [x] Phase 4 (`top_uart_loopback`) implemented.
-- [x] Phase 5 (`top_fifo_loopback`) implemented, built, and simulated; ready for hardware test.
-- [x] Phase 6 (`top_i2c_codec_probe`) implemented, simulated, and built; ready for hardware codec probe.
-- [x] Phase 7 (`top_i2s_tone`) implemented, simulated, and built; ready for hardware audio test.
-- [x] Phase 8 (`top_audio_loopback`) implemented, simulated, built, and verified on hardware (mic loopback + 1 kHz tone).
-- [x] Phase 9 (`top_ps_hello`) implemented, built, and verified on hardware: bare-metal PS app prints a hello banner over UART on button press.
-- [x] Phase 10 (`top_audio_fx`) implemented, simulated, built, and programmed; ready for hardware listening test.
-
-## Getting Started
-
-1. Clone or open this repository.
-2. Connect the Zybo Z7-10 to your computer via the **PROG/UART** micro-USB port.
-3. Set the board power switch to **USB** if you are powering from USB.
-4. Run the first build:
-
-```bash
-make build TOP=top_hello
-```
-
-5. Program the FPGA:
-
-```bash
-make prog
-```
-
-6. Observe the LEDs. If the build succeeded, you should see the expected LED behavior for the current phase.
-
-> The first build may take a few minutes because Vivado is synthesizing and implementing the design. Later builds are faster if you only change HDL.
-
-### Trying the SoC Demo (Phase 9)
-
-The PS + PL flow is three commands — still no GUI:
-
-```bash
-make build_soc SOC_TOP=top_ps_hello   # block design + bitstream + XSA (Vivado batch Tcl)
-make app                              # compile the bare-metal C app (Vitis Python API)
-make run_soc                          # program PL, run the app, print over UART (xsct)
-```
-
-Open a serial terminal on the board's USB-UART (115200 baud) and press BTN0 to see the hello message.
-
----
-
-## Module Index
-
-| Module | Path | Description |
-|--------|------|-------------|
-| `board_pkg` | `rtl/pkg/board_pkg.sv` | Shared board constants |
-| `sync` | `rtl/common/sync.sv` | Input synchronizer |
-| `debounce` | `rtl/common/debounce.sv` | Button debouncer |
-| `edge_detect` | `rtl/common/edge_detect.sv` | Rising/falling edge detector |
-| `top_hello` | `rtl/top/top_hello.sv` | Phase 0: simple LED blinker ✅ |
-| `top_button_led` | `rtl/top/top_button_led.sv` | Phase 1: button-controlled LED ✅ |
-| `top_pwm_rgb` | `rtl/top/top_pwm_rgb.sv` | Phase 2: PWM RGB LED ✅ |
-| `top_switch_modes` | `rtl/top/top_switch_modes.sv` | Phase 3: switch-controlled RGB modes ✅ |
-| `top_uart_loopback` | `rtl/top/top_uart_loopback.sv` | Phase 4: UART loopback ✅ |
-| `top_fifo_loopback` | `rtl/top/top_fifo_loopback.sv` | Phase 5: FIFO loopback ✅ |
-| `fifo_sync` | `rtl/common/fifo_sync.sv` | Parameterized synchronous FIFO |
-| `top_i2c_codec_probe` | `rtl/top/top_i2c_codec_probe.sv` | Phase 6: I2C codec configuration probe ✅ |
-| `top_i2s_tone` | `rtl/top/top_i2s_tone.sv` | Phase 7: I2S tone generator ✅ |
-| `i2c_master` | `rtl/common/i2c_master.sv` | Byte-stream open-drain I2C master |
-| `i2c_master_wo` | `rtl/common/i2c_master_wo.sv` | I2C master that only writes (no read-back) |
-| `i2s_tx` | `rtl/common/i2s_tx.sv` | I2S transmit serializer |
-| `i2s_rx` | `rtl/common/i2s_rx.sv` | I2S receive deserializer |
-| `tone_generator` | `rtl/common/tone_generator.sv` | DDS sine-wave tone generator |
-| `audio_clock_gen` | `rtl/common/audio_clock_gen.sv` | Codec master clock generator (MMCM) |
-| `rgb_pattern_gen` | `rtl/common/rgb_pattern_gen.sv` | RGB LED pattern generator |
-| `uart_rx` | `rtl/common/uart_rx.sv` | UART receiver |
-| `uart_tx` | `rtl/common/uart_tx.sv` | UART transmitter |
-| `pwm` | `rtl/common/pwm.sv` | PWM generator |
-| `tb_sync` | `rtl/tb/tb_sync.sv` | Testbench for synchronizer |
-| `tb_debounce` | `rtl/tb/tb_debounce.sv` | Testbench for debouncer |
-| `tb_edge_detect` | `rtl/tb/tb_edge_detect.sv` | Testbench for edge detector |
-| `tb_rgb_pattern_gen` | `rtl/tb/tb_rgb_pattern_gen.sv` | Testbench for RGB pattern generator |
-| `tb_uart_rx` | `rtl/tb/tb_uart_rx.sv` | Testbench for UART receiver |
-| `tb_uart_tx` | `rtl/tb/tb_uart_tx.sv` | Testbench for UART transmitter |
-| `tb_fifo_sync` | `rtl/tb/tb_fifo_sync.sv` | Testbench for synchronous FIFO |
-| `tb_i2c_master` | `rtl/tb/tb_i2c_master.sv` | Testbench for the I2C master |
-| `tb_i2c_master_wo` | `rtl/tb/tb_i2c_master_wo.sv` | Testbench for the write-only I2C master |
-| `tb_top_i2s_tone` | `rtl/tb/tb_top_i2s_tone.sv` | Integration testbench for I2S tone generator |
-| `tb_i2s_rx` | `rtl/tb/tb_i2s_rx.sv` | Unit testbench for the I2S receiver |
-| `tb_top_audio_loopback` | `rtl/tb/tb_top_audio_loopback.sv` | Integration testbench for audio loopback / tone |
-| `top_audio_loopback` | `rtl/top/top_audio_loopback.sv` | Phase 8: audio loopback or generated tone |
-| `audio_fx_bitcrusher` | `rtl/common/audio_fx_bitcrusher.sv` | Lo-fi bit-crusher effect |
-| `audio_fx_distortion` | `rtl/common/audio_fx_distortion.sv` | Gain + hard-clip distortion effect |
-| `audio_fx_echo` | `rtl/common/audio_fx_echo.sv` | BRAM delay-line echo effect |
-| `tb_audio_fx` | `rtl/tb/tb_audio_fx.sv` | Unit testbench for the audio effects |
-| `tb_top_audio_fx` | `rtl/tb/tb_top_audio_fx.sv` | Integration testbench for the audio effects chain |
-| `top_audio_fx` | `rtl/top/top_audio_fx.sv` | Phase 10: switch-controlled live sound effects ✅ |
-| `top_ps_hello` | `rtl/top/top_ps_hello.sv` | Phase 9: PS bring-up (EMIO GPIO button → UART hello) ✅ |
-
-This table will grow as we add phases.
 
 ---
 
