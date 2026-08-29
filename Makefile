@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# Makefile for the Zybo Z7-10 pure FPGA project.
+# Makefile for the Zybo Z7-10 FPGA & SoC project (command-line only, no IDE).
 #------------------------------------------------------------------------------
 
 # Default top-level module.
