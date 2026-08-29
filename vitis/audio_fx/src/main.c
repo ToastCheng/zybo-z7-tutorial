@@ -13,7 +13,7 @@
 //        [4]   codec_ready (releases the PL I2S datapath reset)
 //        [5]   unmute (drives ac_muten)
 //   3. Runs a UART menu (115200 baud) so the effect can be changed live
-//      from a terminal: 0-3 select, +/- intensity, r codec read-back.
+//      from a terminal: 0-3 select, +/- intensity, m mute.
 //
 // SDT flow note: peripheral configs are looked up by base address from
 // xparameters.h, not by device ID.
@@ -75,26 +75,6 @@ static int codec_write(u16 reg_value)
     return XIicPs_MasterSendPolled(&i2c, buf, sizeof(buf), I2C_DEVICE_ADDR);
 }
 
-// Read one codec register (9-bit data).  Returns the register value, or -1
-// on a bus error.  Uses a repeated start: write the register address byte,
-// then read two bytes without a stop in between.
-static int codec_read(u8 reg_addr)
-{
-    u8 addr_byte = (u8)(reg_addr << 1);
-    u8 buf[2]    = { 0, 0 };
-    int status;
-
-    XIicPs_SetOptions(&i2c, XIICPS_REP_START_OPTION);
-    status = XIicPs_MasterSendPolled(&i2c, &addr_byte, 1, I2C_DEVICE_ADDR);
-    if (status == XST_SUCCESS)
-        status = XIicPs_MasterRecvPolled(&i2c, buf, sizeof(buf), I2C_DEVICE_ADDR);
-    XIicPs_ClearOptions(&i2c, XIICPS_REP_START_OPTION);
-
-    if (status != XST_SUCCESS)
-        return -1;
-    return ((buf[0] & 0x1) << 8) | buf[1];
-}
-
 //------------------------------------------------------------------------------
 // Control word -> PL
 //------------------------------------------------------------------------------
@@ -105,8 +85,8 @@ static void update_control(void)
              | ((intensity & 0x3) << CTRL_INTENSITY)
              | CTRL_READY | CTRL_UNMUTE;
     XGpio_DiscreteWrite(&gpio, 1, ctrl);
-    xil_printf("-> effect %d (%s), intensity %lu\r\n",
-               fx_sel, fx_names[fx_sel], intensity);
+    xil_printf("-> effect %d (%s), intensity %d\r\n",
+               (int)fx_sel, fx_names[fx_sel], (int)intensity);
 }
 
 //------------------------------------------------------------------------------
@@ -160,7 +140,7 @@ static void print_menu(void)
 {
     xil_printf("\r\n--- Phase 11: PS-controlled audio effects ---\r\n");
     xil_printf("  0 bypass | 1 bit-crusher | 2 echo | 3 distortion\r\n");
-    xil_printf("  +/- intensity | m mute/unmute | r read codec R4\r\n");
+    xil_printf("  +/- intensity | m mute/unmute\r\n");
 }
 
 int main(void)
@@ -201,14 +181,6 @@ int main(void)
             if (muted) ctrl &= ~CTRL_UNMUTE; else ctrl |= CTRL_UNMUTE;
             XGpio_DiscreteWrite(&gpio, 1, ctrl);
             xil_printf("-> %s\r\n", muted ? "muted" : "unmuted");
-            break;
-        }
-        case 'r': {
-            int value = codec_read(4);   // R4: analog audio path
-            if (value < 0)
-                xil_printf("ERROR: codec read failed\r\n");
-            else
-                xil_printf("R4 = 0x%03X (wrote 0x015)\r\n", value);
             break;
         }
         case 'h': case '?':

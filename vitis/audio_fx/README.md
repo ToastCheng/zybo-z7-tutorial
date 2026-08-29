@@ -26,8 +26,11 @@ Open a serial terminal on the PROG/UART port at 115200 baud.
 | `3` | Distortion |
 | `+` / `-` | Intensity up / down (0–3) |
 | `m` | Mute / unmute |
-| `r` | Read codec register R4 over I2C and print it |
 | `h` / `?` | Reprint the menu |
+
+Note: there is deliberately no register read-back command — the SSM2603
+control interface is effectively write-only (read attempts return constant
+garbage on this board).
 
 ## Control Word (AXI GPIO channel 1)
 

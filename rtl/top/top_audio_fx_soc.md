@@ -25,12 +25,11 @@ datapath, and the effect chain itself.
   ```
   --- Phase 11: PS-controlled audio effects ---
     0 bypass | 1 bit-crusher | 2 echo | 3 distortion
-    +/- intensity | m mute/unmute | r read codec R4
+    +/- intensity | m mute/unmute
   ```
 
 - Speak into the mic and press `0`..`3` to hear the effect change live;
-  `+`/`-` changes the intensity, `m` mutes, `r` reads a codec register back
-  over I2C and prints it.
+  `+`/`-` changes the intensity, `m` mutes.
 - The four LEDs mirror `ctrl[3:0]` (effect select + intensity) as a
   hardware-side debug view.
 
@@ -44,7 +43,7 @@ anyway, because that is how real Zynq systems are partitioned:
 
 | Task | Where | Why |
 |------|-------|-----|
-| Codec register init | PS (I2C1) | Runs once at startup; a C table is easier to read, tweak, and debug than an FSM + LUT. The hard I2C controller is proven silicon and can also **read back** registers. |
+| Codec register init | PS (I2C1) | Runs once at startup; a C table is easier to read, tweak, and debug than an FSM + LUT. The hard I2C controller is proven silicon. |
 | Effect select / intensity / mute | PS (AXI GPIO) | Human-speed control; a UART menu beats re-synthesizing for every parameter change. |
 | I2S datapath + effects | PL | Sample-rate streaming with deterministic latency — the FPGA's job. |
 | Audio clock (MMCM) | PL | The codec MCLK must come from the fabric clocking resources. |
@@ -63,8 +62,14 @@ CONFIG.PCW_I2C1_I2C1_IO {EMIO}
 
 The wrapper exposes them as tri-state `inout` ports (`IIC_1_0_scl_io`,
 `IIC_1_0_sda_io`); direction is controlled by the PS peripheral, exactly like
-the EMIO GPIO in Phase 9. On the software side the `xiicps` driver is used
-in polled mode (`XIicPs_MasterSend` / `XIicPs_MasterRecv`).
+the EMIO GPIO in Phase 9. On the software side the `xiicps` driver is used in polled mode
+(`XIicPs_MasterSendPolled`).
+
+> **SSM2603 is write-only:** the codec ACKs its address on read
+> transactions but returns constant garbage (`0x100`…) instead of register
+> contents — verified on this board with both repeated-start and pure-read
+> transactions. This is also why the Phase 6 RTL probe verifies the codec by
+> ACK, not by read-back.
 
 ### AXI GPIO: the first AXI peripheral
 
@@ -142,8 +147,7 @@ declares the crossing with `set_false_path` to the first sync stage.
 4. Open the UART (115200 baud). Expect 11 codec writes to succeed, then the
    menu.
 5. Mic in, headphones out: `0` clean loopback, `1` bit-crusher, `2` echo,
-   `3` distortion; `+`/`-` changes intensity; `r` reads back codec R4
-   (expect `0x015`).
+   `3` distortion; `+`/`-` changes intensity; `m` mutes/unmutes.
 
 ## Exercises
 
@@ -152,4 +156,5 @@ declares the crossing with `set_false_path` to the first sync stage.
   intensity).
 - Change the echo depth at runtime: add `ctrl[10:6]` as a delay-shift
   control and modify `audio_fx_echo` to skip `1 << n` frames per sample.
-- Read back **all** codec registers with `r` and diff them against the LUT.
+- Boost the mic gain by editing the R4 entry in the C codec table (no
+  re-synthesis needed — one of the payoffs of moving init to software).
