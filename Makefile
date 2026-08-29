@@ -30,10 +30,14 @@ sim:
 # SoC targets (Phase 9 and later: PS + PL designs)
 #------------------------------------------------------------------------------
 
-# SoC top-level module and Vitis executables.
-SOC_TOP ?= top_ps_hello
-VITIS   ?= vitis
-XSCT    ?= xsct
+# SoC top-level module, Vitis application, and Vitis executables.
+# SOC_TOP selects the hardware (build/<soc_name>.bit/.xsa); APP selects the
+# bare-metal application in vitis/<app>/.
+SOC_TOP  ?= top_ps_hello
+SOC_NAME  = $(SOC_TOP:top_%=%)
+APP      ?= ps_hello
+VITIS    ?= vitis
+XSCT     ?= xsct
 
 # Build the block design, bitstream, and XSA for the selected SoC top module.
 build_soc:
@@ -41,11 +45,13 @@ build_soc:
 
 # Build the bare-metal PS application from the exported XSA.
 app:
-	$(VITIS) -s vitis/ps_hello/build_app.py
+	$(VITIS) -s vitis/$(APP)/build_app.py
 
 # Program the PL and download/run the PS application via JTAG.
 run_soc:
-	$(XSCT) scripts/run_soc.tcl build/ps_hello.bit build/vitis_ws/ps_hello_app/build/ps_hello_app.elf
+	$(XSCT) scripts/run_soc.tcl build/$(SOC_NAME).bit \
+		build/vitis_ws/$(APP)_app/build/$(APP)_app.elf \
+		build/$(SOC_NAME).xsa
 
 # Remove generated build and simulation artifacts.
 clean:
@@ -58,7 +64,7 @@ help:
 	@echo "  make build TOP=<top>     - Synthesize and generate a bitstream"
 	@echo "  make prog  TOP=<top>     - Program the FPGA via JTAG"
 	@echo "  make sim   TB=<tb>       - Run a testbench in Vivado Simulator"
-	@echo "  make build_soc           - Build PS+PL block design, bitstream, and XSA"
-	@echo "  make app                 - Build the bare-metal PS application (Vitis)"
-	@echo "  make run_soc             - Program PL and run the PS app via JTAG"
+	@echo "  make build_soc SOC_TOP=<top> - Build PS+PL block design, bitstream, and XSA"
+	@echo "  make app       APP=<app>     - Build the bare-metal PS application (Vitis)"
+	@echo "  make run_soc   SOC_TOP=<top> APP=<app> - Program PL and run the PS app via JTAG"
 	@echo "  make clean               - Remove build and simulation artifacts"
