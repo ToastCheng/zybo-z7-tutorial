@@ -33,8 +33,9 @@ This file contains project-specific conventions and workflow preferences for any
 ### SoC (PS + PL) designs — Phase 9 onward
 
 - Build the block design, bitstream, and XSA: `make build_soc SOC_TOP=<soc_top_module_name>`
-- Build the bare-metal PS application: `make app`
-- Program the PL and run the PS app over JTAG: `make run_soc`
+- Build the bare-metal PS application: `make app APP=<app_name>`
+- Program the PL and run the PS app over JTAG: `make run_soc SOC_TOP=<soc_top_module_name> APP=<app_name>`
+- The block-design contents are per-top: `scripts/bd/<soc_top_module_name>.tcl` is sourced by `scripts/build_soc.tcl`.
 - SoC application sources live in `vitis/<app_name>/`; generated Vitis workspace files go to `build/vitis_ws/` (ignored by git).
 
 ## Testing on Hardware

@@ -228,6 +228,7 @@ The project is built in small, self-contained phases. Each phase adds one new co
 | 8 | Audio Loopback / Tone | I2C + I2S together: mic-in → headphones or generated tone | `top_audio_loopback` |
 | 9 | PS Hello | First use of the ARM PS: bare-metal app, EMIO GPIO, UART | `top_ps_hello` |
 | 10 | Audio Effects | BRAM delay line, saturation, bit manipulation | `top_audio_fx` |
+| 11 | PS Audio Effects | PS I2C codec config, AXI GPIO control, UART menu | `top_audio_fx_soc` |
 
 Each phase has:
 
