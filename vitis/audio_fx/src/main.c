@@ -8,14 +8,14 @@
 //   1. Configures the SSM2603 codec over the PS I2C1 controller (routed
 //      through EMIO to the PL codec pins).
 //   2. Writes a 32-bit control word to the PL through AXI GPIO:
-//        [2:0] effect select (0 bypass, 1 crusher, 2 echo, 3 distortion,
+//        [3:0] effect select (0 bypass, 1 crusher, 2 echo, 3 distortion,
 //                             4 biquad filter, 5 chorus/flanger/vibrato,
-//                             6 tremolo)
-//        [4:3] intensity (0..3; per-effect preset)
-//        [5]   codec_ready (releases the PL I2S datapath reset)
-//        [6]   unmute (drives ac_muten)
+//                             6 tremolo, 7 noise gate, 8 compressor)
+//        [5:4] intensity (0..3; per-effect preset)
+//        [6]   codec_ready (releases the PL I2S datapath reset)
+//        [7]   unmute (drives ac_muten)
 //   3. Runs a UART menu (115200 baud) so the effect can be changed live
-//      from a terminal: 0-6 select, +/- intensity, m mute.
+//      from a terminal: 0-8 select, +/- intensity, m mute.
 //
 // SDT flow note: peripheral configs are looked up by base address from
 // xparameters.h, not by device ID.
@@ -35,10 +35,10 @@
 #define I2C_CLOCK_HZ    100000  // 100 kHz standard mode
 
 // AXI GPIO control-word bits.
-#define CTRL_FX_MASK    0x07
-#define CTRL_INTENSITY  3
-#define CTRL_READY      (1u << 5)
-#define CTRL_UNMUTE     (1u << 6)
+#define CTRL_FX_MASK    0x0F
+#define CTRL_INTENSITY  4
+#define CTRL_READY      (1u << 6)
+#define CTRL_UNMUTE     (1u << 7)
 
 // SSM2603 configuration for I2S 16-bit playback/record at 44.1 kHz.
 // Each entry packs the two bytes sent on the bus:
@@ -60,14 +60,17 @@ static const u16 codec_lut[] = {
 #define CODEC_LUT_SIZE  (sizeof(codec_lut) / sizeof(codec_lut[0]))
 
 static const char *fx_names[] = { "bypass", "bit-crusher", "echo", "distortion",
-                                  "filter", "mod-delay", "tremolo" };
+                                  "filter", "mod-delay", "tremolo",
+                                  "gate", "comp/limiter" };
 
-// Per-effect preset names for effects 4..6 (indexed by intensity 0..3).
+// Per-effect preset names for effects 4..8 (indexed by intensity 0..3).
 static const char *filt_names[] = { "low-pass", "high-pass", "band-pass",
                                     "notch" };
 static const char *mod_names[]  = { "chorus", "flanger", "vibrato",
                                     "slow chorus" };
 static const char *trem_names[] = { "subtle", "mild", "deep", "full" };
+static const char *gate_names[] = { "-50 dB", "-40 dB", "-30 dB", "-20 dB" };
+static const char *comp_names[] = { "-6 dB", "-12 dB", "-18 dB", "-24 dB" };
 
 static const char *preset_name(u32 fx, u32 i)
 {
@@ -75,6 +78,8 @@ static const char *preset_name(u32 fx, u32 i)
     case 4:  return filt_names[i];
     case 5:  return mod_names[i];
     case 6:  return trem_names[i];
+    case 7:  return gate_names[i];
+    case 8:  return comp_names[i];
     default: return "";
     }
 }
@@ -163,15 +168,15 @@ static int codec_init(void)
 
 static void print_menu(void)
 {
-    xil_printf("\r\n--- Phase 11-13: PS-controlled audio effects ---\r\n");
-    xil_printf("  0 bypass | 1 bit-crusher | 2 echo | 3 distortion | 4 filter\r\n");
-    xil_printf("  5 chorus/flanger/vibrato | 6 tremolo\r\n");
+    xil_printf("\r\n--- Phase 11-14: PS-controlled audio effects ---\r\n");
+    xil_printf("  0 bypass | 1 crusher | 2 echo | 3 distortion | 4 filter\r\n");
+    xil_printf("  5 chorus/flanger | 6 tremolo | 7 gate | 8 comp/limiter\r\n");
     xil_printf("  +/- intensity (per-effect preset) | m mute/unmute\r\n");
 }
 
 int main(void)
 {
-    xil_printf("\r\nPhase 11-13: PS-controlled audio effects\r\n");
+    xil_printf("\r\nPhase 11-14: PS-controlled audio effects\r\n");
 
     if (i2c_init() != XST_SUCCESS || gpio_init() != XST_SUCCESS)
         return 1;
@@ -189,8 +194,8 @@ int main(void)
         char c = (char)XUartPs_RecvByte(UART_BASEADDR);
 
         switch (c) {
-        case '0': case '1': case '2': case '3':
-        case '4': case '5': case '6':
+        case '0': case '1': case '2': case '3': case '4':
+        case '5': case '6': case '7': case '8':
             fx_sel = (u32)(c - '0');
             update_control();
             break;
