@@ -231,6 +231,7 @@ The project is built in small, self-contained phases. Each phase adds one new co
 | 11 | PS Audio Effects | PS I2C codec config, AXI GPIO control, UART menu | `top_audio_fx_soc` |
 | 12 | Biquad Filter Effect | Fixed-point IIR filtering, DSP48 multipliers | `top_audio_fx_soc` (extended) |
 | 13 | Modulation Effects | LFO, variable-tap delay line, chorus/flanger/tremolo | `top_audio_fx_soc` (extended) |
+| 14 | Dynamics Effects | Envelope follower, feedback AGC, gate hysteresis | `top_audio_fx_soc` (extended) |
 
 Each phase has:
 
