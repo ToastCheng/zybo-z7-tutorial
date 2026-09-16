@@ -11,12 +11,12 @@
 //     codec from the bare-metal application.
 //   - The PS writes a 32-bit control word over AXI GPIO (M_AXI_GP0):
 //
-//       ctrl[1:0]  effect select: 00 bypass, 01 bit-crusher, 10 echo,
-//                                 11 distortion
-//       ctrl[3:2]  effect intensity (0..3)
-//       ctrl[4]    codec_ready: releases the I2S datapath reset once the
+//       ctrl[2:0]  effect select: 000 bypass, 001 bit-crusher, 010 echo,
+//                                 011 distortion, 100 biquad filter
+//       ctrl[4:3]  effect intensity (0..3; filter preset for the biquad)
+//       ctrl[5]    codec_ready: releases the I2S datapath reset once the
 //                  codec is configured (replaces the RTL init_done)
-//       ctrl[5]    mute enable (drives ac_muten)
+//       ctrl[6]    unmute (drives ac_muten)
 //
 // The PL keeps the real-time datapath: audio master clock (MMCM), I2S
 // receive/transmit, and the effect chain - the parts that must run at
@@ -85,13 +85,13 @@ module top_audio_fx_soc #(
         ctrl_sync_1 <= ctrl_sync_0;
     end
 
-    logic [1:0] fx_sel_mclk;
+    logic [2:0] fx_sel_mclk;
     logic [1:0] intensity_mclk;
     logic       codec_ready_mclk;
 
-    assign fx_sel_mclk    = ctrl_sync_1[1:0];
-    assign intensity_mclk = ctrl_sync_1[3:2];
-    assign codec_ready_mclk = ctrl_sync_1[4];
+    assign fx_sel_mclk    = ctrl_sync_1[2:0];
+    assign intensity_mclk = ctrl_sync_1[4:3];
+    assign codec_ready_mclk = ctrl_sync_1[5];
 
     //--------------------------------------------------------------------------
     // I2S receive/transmit (MCLK domain)
@@ -123,6 +123,7 @@ module top_audio_fx_soc #(
     logic signed [15:0] crush_l, crush_r;
     logic signed [15:0] dist_l,  dist_r;
     logic signed [15:0] echo_l,  echo_r;
+    logic signed [15:0] filt_l,  filt_r;
 
     audio_fx_bitcrusher crush_l_inst (
         .sample_in  (rx_ls),
@@ -163,14 +164,34 @@ module top_audio_fx_soc #(
         .out_r      (echo_r)
     );
 
-    // Effect select mux: 00 bypass, 01 crusher, 10 echo, 11 distortion.
+    audio_fx_biquad filt_l_inst (
+        .clk        (mclk),
+        .rst        (i2s_rst),
+        .sample_req (sample_req),
+        .sample_in  (rx_ls),
+        .intensity  (intensity_mclk),
+        .sample_out (filt_l)
+    );
+
+    audio_fx_biquad filt_r_inst (
+        .clk        (mclk),
+        .rst        (i2s_rst),
+        .sample_req (sample_req),
+        .sample_in  (rx_rs),
+        .intensity  (intensity_mclk),
+        .sample_out (filt_r)
+    );
+
+    // Effect select mux: 000 bypass, 001 crusher, 010 echo, 011 distortion,
+    // 100 biquad filter.
     logic signed [15:0] tx_l, tx_r;
 
     always_comb begin
         case (fx_sel_mclk)
-            2'b01:   {tx_l, tx_r} = {crush_l, crush_r};
-            2'b10:   {tx_l, tx_r} = {echo_l,  echo_r};
-            2'b11:   {tx_l, tx_r} = {dist_l,  dist_r};
+            3'b001:  {tx_l, tx_r} = {crush_l, crush_r};
+            3'b010:  {tx_l, tx_r} = {echo_l,  echo_r};
+            3'b011:  {tx_l, tx_r} = {dist_l,  dist_r};
+            3'b100:  {tx_l, tx_r} = {filt_l,  filt_r};
             default: {tx_l, tx_r} = {rx_ls,   rx_rs};
         endcase
     end
@@ -192,7 +213,7 @@ module top_audio_fx_soc #(
     // MCLK output.
     assign ac_mclk = mclk;
 
-    // Mute is controlled by the PS (ctrl[5]).
-    assign ac_muten = ctrl_sync_1[5];
+    // Mute is controlled by the PS (ctrl[6]).
+    assign ac_muten = ctrl_sync_1[6];
 
 endmodule : top_audio_fx_soc

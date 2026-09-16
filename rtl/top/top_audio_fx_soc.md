@@ -23,15 +23,16 @@ datapath, and the effect chain itself.
   a menu:
 
   ```
-  --- Phase 11: PS-controlled audio effects ---
-    0 bypass | 1 bit-crusher | 2 echo | 3 distortion
-    +/- intensity | m mute/unmute
+  --- Phase 11/12: PS-controlled audio effects ---
+    0 bypass | 1 bit-crusher | 2 echo | 3 distortion | 4 filter
+    +/- intensity (filter: LP/HP/BP/notch preset) | m mute/unmute
   ```
 
-- Speak into the mic and press `0`..`3` to hear the effect change live;
-  `+`/`-` changes the intensity, `m` mutes.
-- The four LEDs mirror `ctrl[3:0]` (effect select + intensity) as a
-  hardware-side debug view.
+- Speak into the mic and press `0`..`4` to hear the effect change live;
+  `+`/`-` changes the intensity (for the filter: the LP/HP/BP/notch
+  preset), `m` mutes.
+- The four LEDs mirror `ctrl[3:0]` (effect select low bits + intensity) as
+  a hardware-side debug view.
 
 ## Concepts
 
@@ -89,11 +90,15 @@ From software it is a memory-mapped register write: `XGpio_DiscreteWrite`.
 ### The control word
 
 ```
-bit  [5]    unmute      -> ac_muten
-bit  [4]    codec_ready -> releases the I2S datapath reset
-bits [3:2]  intensity   -> effect modules (0..3)
-bits [1:0]  fx_sel      -> 00 bypass, 01 crusher, 10 echo, 11 distortion
+bit  [6]    unmute      -> ac_muten
+bit  [5]    codec_ready -> releases the I2S datapath reset
+bits [4:3]  intensity   -> effect modules (0..3; biquad filter preset)
+bits [2:0]  fx_sel      -> 000 bypass, 001 crusher, 010 echo,
+                           011 distortion, 100 biquad filter
 ```
+
+(The biquad filter was added in Phase 12, which widened `fx_sel` from two
+bits to three and shifted the upper fields up by one.)
 
 `codec_ready` replaces the RTL `init_done` from Phase 10: the I2S datapath
 is held in reset until software has finished configuring the codec.
@@ -121,11 +126,11 @@ declares the crossing with `set_false_path` to the first sync stage.
 │  i2s_rx ◄── ac_recdat             │
 │      │                            │
 │      ▼                            │
-│  fx chain (crusher/echo/distort)  │ ◄── fx_sel, intensity (ctrl)
+│  fx chain (crush/echo/dist/filt)  │ ◄── fx_sel, intensity (ctrl)
 │      │                            │
 │      ▼                            │
 │  i2s_tx ─► ac_bclk/pblrc/pbdat    │
-│  ac_muten ◄── ctrl[5]             │
+│  ac_muten ◄── ctrl[6]             │
 └───────────────────────────────────┘
 ```
 
@@ -147,7 +152,8 @@ declares the crossing with `set_false_path` to the first sync stage.
 4. Open the UART (115200 baud). Expect 11 codec writes to succeed, then the
    menu.
 5. Mic in, headphones out: `0` clean loopback, `1` bit-crusher, `2` echo,
-   `3` distortion; `+`/`-` changes intensity; `m` mutes/unmutes.
+   `3` distortion, `4` biquad filter; `+`/`-` changes intensity (filter:
+   LP/HP/BP/notch preset); `m` mutes/unmutes.
 
 ## Exercises
 
