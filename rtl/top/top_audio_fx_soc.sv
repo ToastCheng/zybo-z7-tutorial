@@ -12,8 +12,9 @@
 //   - The PS writes a 32-bit control word over AXI GPIO (M_AXI_GP0):
 //
 //       ctrl[2:0]  effect select: 000 bypass, 001 bit-crusher, 010 echo,
-//                                 011 distortion, 100 biquad filter
-//       ctrl[4:3]  effect intensity (0..3; filter preset for the biquad)
+//                                 011 distortion, 100 biquad filter,
+//                                 101 chorus/flanger/vibrato, 110 tremolo
+//       ctrl[4:3]  effect intensity (0..3; per-effect preset)
 //       ctrl[5]    codec_ready: releases the I2S datapath reset once the
 //                  codec is configured (replaces the RTL init_done)
 //       ctrl[6]    unmute (drives ac_muten)
@@ -124,6 +125,8 @@ module top_audio_fx_soc #(
     logic signed [15:0] dist_l,  dist_r;
     logic signed [15:0] echo_l,  echo_r;
     logic signed [15:0] filt_l,  filt_r;
+    logic signed [15:0] chor_l,  chor_r;
+    logic signed [15:0] trem_l,  trem_r;
 
     audio_fx_bitcrusher crush_l_inst (
         .sample_in  (rx_ls),
@@ -182,8 +185,30 @@ module top_audio_fx_soc #(
         .sample_out (filt_r)
     );
 
+    audio_fx_tremolo trem_inst (
+        .clk        (mclk),
+        .rst        (i2s_rst),
+        .sample_req (sample_req),
+        .in_l       (rx_ls),
+        .in_r       (rx_rs),
+        .intensity  (intensity_mclk),
+        .out_l      (trem_l),
+        .out_r      (trem_r)
+    );
+
+    audio_fx_chorus chorus_inst (
+        .clk        (mclk),
+        .rst        (i2s_rst),
+        .sample_req (sample_req),
+        .in_l       (rx_ls),
+        .in_r       (rx_rs),
+        .intensity  (intensity_mclk),
+        .out_l      (chor_l),
+        .out_r      (chor_r)
+    );
+
     // Effect select mux: 000 bypass, 001 crusher, 010 echo, 011 distortion,
-    // 100 biquad filter.
+    // 100 biquad filter, 101 chorus/flanger/vibrato, 110 tremolo.
     logic signed [15:0] tx_l, tx_r;
 
     always_comb begin
@@ -192,6 +217,8 @@ module top_audio_fx_soc #(
             3'b010:  {tx_l, tx_r} = {echo_l,  echo_r};
             3'b011:  {tx_l, tx_r} = {dist_l,  dist_r};
             3'b100:  {tx_l, tx_r} = {filt_l,  filt_r};
+            3'b101:  {tx_l, tx_r} = {chor_l,  chor_r};
+            3'b110:  {tx_l, tx_r} = {trem_l,  trem_r};
             default: {tx_l, tx_r} = {rx_ls,   rx_rs};
         endcase
     end
