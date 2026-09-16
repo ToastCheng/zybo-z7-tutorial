@@ -11,13 +11,14 @@
 //     codec from the bare-metal application.
 //   - The PS writes a 32-bit control word over AXI GPIO (M_AXI_GP0):
 //
-//       ctrl[2:0]  effect select: 000 bypass, 001 bit-crusher, 010 echo,
-//                                 011 distortion, 100 biquad filter,
-//                                 101 chorus/flanger/vibrato, 110 tremolo
-//       ctrl[4:3]  effect intensity (0..3; per-effect preset)
-//       ctrl[5]    codec_ready: releases the I2S datapath reset once the
+//       ctrl[3:0]  effect select: 0000 bypass, 0001 bit-crusher, 0010 echo,
+//                                 0011 distortion, 0100 biquad filter,
+//                                 0101 chorus/flanger/vibrato, 0110 tremolo,
+//                                 0111 noise gate, 1000 compressor/limiter
+//       ctrl[5:4]  effect intensity (0..3; per-effect preset)
+//       ctrl[6]    codec_ready: releases the I2S datapath reset once the
 //                  codec is configured (replaces the RTL init_done)
-//       ctrl[6]    unmute (drives ac_muten)
+//       ctrl[7]    unmute (drives ac_muten)
 //
 // The PL keeps the real-time datapath: audio master clock (MMCM), I2S
 // receive/transmit, and the effect chain - the parts that must run at
@@ -86,13 +87,13 @@ module top_audio_fx_soc #(
         ctrl_sync_1 <= ctrl_sync_0;
     end
 
-    logic [2:0] fx_sel_mclk;
+    logic [3:0] fx_sel_mclk;
     logic [1:0] intensity_mclk;
     logic       codec_ready_mclk;
 
-    assign fx_sel_mclk    = ctrl_sync_1[2:0];
-    assign intensity_mclk = ctrl_sync_1[4:3];
-    assign codec_ready_mclk = ctrl_sync_1[5];
+    assign fx_sel_mclk    = ctrl_sync_1[3:0];
+    assign intensity_mclk = ctrl_sync_1[5:4];
+    assign codec_ready_mclk = ctrl_sync_1[6];
 
     //--------------------------------------------------------------------------
     // I2S receive/transmit (MCLK domain)
@@ -127,6 +128,8 @@ module top_audio_fx_soc #(
     logic signed [15:0] filt_l,  filt_r;
     logic signed [15:0] chor_l,  chor_r;
     logic signed [15:0] trem_l,  trem_r;
+    logic signed [15:0] gate_l,  gate_r;
+    logic signed [15:0] comp_l,  comp_r;
 
     audio_fx_bitcrusher crush_l_inst (
         .sample_in  (rx_ls),
@@ -207,18 +210,43 @@ module top_audio_fx_soc #(
         .out_r      (chor_r)
     );
 
-    // Effect select mux: 000 bypass, 001 crusher, 010 echo, 011 distortion,
-    // 100 biquad filter, 101 chorus/flanger/vibrato, 110 tremolo.
+    audio_fx_gate gate_inst (
+        .clk        (mclk),
+        .rst        (i2s_rst),
+        .sample_req (sample_req),
+        .in_l       (rx_ls),
+        .in_r       (rx_rs),
+        .intensity  (intensity_mclk),
+        .out_l      (gate_l),
+        .out_r      (gate_r)
+    );
+
+    audio_fx_comp comp_inst (
+        .clk        (mclk),
+        .rst        (i2s_rst),
+        .sample_req (sample_req),
+        .in_l       (rx_ls),
+        .in_r       (rx_rs),
+        .intensity  (intensity_mclk),
+        .out_l      (comp_l),
+        .out_r      (comp_r)
+    );
+
+    // Effect select mux: 0000 bypass, 0001 crusher, 0010 echo,
+    // 0011 distortion, 0100 biquad filter, 0101 chorus/flanger/vibrato,
+    // 0110 tremolo, 0111 noise gate, 1000 compressor.
     logic signed [15:0] tx_l, tx_r;
 
     always_comb begin
         case (fx_sel_mclk)
-            3'b001:  {tx_l, tx_r} = {crush_l, crush_r};
-            3'b010:  {tx_l, tx_r} = {echo_l,  echo_r};
-            3'b011:  {tx_l, tx_r} = {dist_l,  dist_r};
-            3'b100:  {tx_l, tx_r} = {filt_l,  filt_r};
-            3'b101:  {tx_l, tx_r} = {chor_l,  chor_r};
-            3'b110:  {tx_l, tx_r} = {trem_l,  trem_r};
+            4'd1:    {tx_l, tx_r} = {crush_l, crush_r};
+            4'd2:    {tx_l, tx_r} = {echo_l,  echo_r};
+            4'd3:    {tx_l, tx_r} = {dist_l,  dist_r};
+            4'd4:    {tx_l, tx_r} = {filt_l,  filt_r};
+            4'd5:    {tx_l, tx_r} = {chor_l,  chor_r};
+            4'd6:    {tx_l, tx_r} = {trem_l,  trem_r};
+            4'd7:    {tx_l, tx_r} = {gate_l,  gate_r};
+            4'd8:    {tx_l, tx_r} = {comp_l,  comp_r};
             default: {tx_l, tx_r} = {rx_ls,   rx_rs};
         endcase
     end
@@ -240,7 +268,7 @@ module top_audio_fx_soc #(
     // MCLK output.
     assign ac_mclk = mclk;
 
-    // Mute is controlled by the PS (ctrl[6]).
-    assign ac_muten = ctrl_sync_1[6];
+    // Mute is controlled by the PS (ctrl[7]).
+    assign ac_muten = ctrl_sync_1[7];
 
 endmodule : top_audio_fx_soc

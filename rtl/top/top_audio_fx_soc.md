@@ -23,17 +23,18 @@ datapath, and the effect chain itself.
   a menu:
 
   ```
-  --- Phase 11-13: PS-controlled audio effects ---
-    0 bypass | 1 bit-crusher | 2 echo | 3 distortion | 4 filter
-    5 chorus/flanger/vibrato | 6 tremolo
+  --- Phase 11-14: PS-controlled audio effects ---
+    0 bypass | 1 crusher | 2 echo | 3 distortion | 4 filter
+    5 chorus/flanger | 6 tremolo | 7 gate | 8 comp/limiter
     +/- intensity (per-effect preset) | m mute/unmute
   ```
 
-- Speak into the mic and press `0`..`6` to hear the effect change live;
+- Speak into the mic and press `0`..`8` to hear the effect change live;
   `+`/`-` changes the intensity (per-effect preset: filter type, chorus
-  family member, tremolo depth), `m` mutes.
-- The four LEDs mirror `ctrl[3:0]` (effect select low bits + intensity) as
-  a hardware-side debug view.
+  family member, tremolo depth, gate threshold, comp target level),
+  `m` mutes.
+- The four LEDs mirror `ctrl[3:0]` (exactly the effect select) as a
+  hardware-side debug view.
 
 ## Concepts
 
@@ -91,17 +92,17 @@ From software it is a memory-mapped register write: `XGpio_DiscreteWrite`.
 ### The control word
 
 ```
-bit  [6]    unmute      -> ac_muten
-bit  [5]    codec_ready -> releases the I2S datapath reset
-bits [4:3]  intensity   -> effect preset (0..3)
-bits [2:0]  fx_sel      -> 000 bypass, 001 crusher, 010 echo,
-                           011 distortion, 100 biquad filter,
-                           101 chorus/flanger/vibrato, 110 tremolo
+bit  [7]    unmute      -> ac_muten
+bit  [6]    codec_ready -> releases the I2S datapath reset
+bits [5:4]  intensity   -> effect preset (0..3)
+bits [3:0]  fx_sel      -> 0 bypass, 1 crusher, 2 echo, 3 distortion,
+                           4 biquad filter, 5 chorus/flanger/vibrato,
+                           6 tremolo, 7 noise gate, 8 compressor/limiter
 ```
 
 (The biquad filter was added in Phase 12, which widened `fx_sel` from two
-bits to three and shifted the upper fields up by one; Phase 13 added the
-two modulation effects.)
+bits to three; Phase 14 widened it to four and shifted the upper fields up
+again. The LED debug view now shows exactly `fx_sel`.)
 
 `codec_ready` replaces the RTL `init_done` from Phase 10: the I2S datapath
 is held in reset until software has finished configuring the codec.
@@ -129,12 +130,12 @@ declares the crossing with `set_false_path` to the first sync stage.
 │  i2s_rx ◄── ac_recdat             │
 │      │                            │
 │      ▼                            │
-│  fx chain (crush/echo/dist/       │ ◄── fx_sel, intensity (ctrl)
-│            filt/chorus/tremolo)   │
+│  fx chain (crush/echo/dist/filt/  │ ◄── fx_sel, intensity (ctrl)
+│            chorus/trem/gate/comp) │
 │      │                            │
 │      ▼                            │
 │  i2s_tx ─► ac_bclk/pblrc/pbdat    │
-│  ac_muten ◄── ctrl[6]             │
+│  ac_muten ◄── ctrl[7]             │
 └───────────────────────────────────┘
 ```
 
@@ -157,7 +158,8 @@ declares the crossing with `set_false_path` to the first sync stage.
    menu.
 5. Mic in, headphones out: `0` clean loopback, `1` bit-crusher, `2` echo,
    `3` distortion, `4` biquad filter, `5` chorus/flanger/vibrato,
-   `6` tremolo; `+`/`-` cycles the per-effect preset; `m` mutes/unmutes.
+   `6` tremolo, `7` noise gate, `8` compressor/limiter; `+`/`-` cycles the
+   per-effect preset; `m` mutes/unmutes.
 
 ## Exercises
 
