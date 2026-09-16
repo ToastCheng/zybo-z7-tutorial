@@ -40,7 +40,6 @@ create_generated_clock -name ac_mclk_pin \
 # (FCLK domain) and sampled in the MCLK domain through 2-flop synchronizers.
 # Do not time it as a synchronous path.
 set_false_path -to [get_cells ctrl_sync_0_reg[*]]
-set_false_path -to [get_cells ready_sync_0_reg]
 
 # The 125 MHz fabric clock and the audio MCLK come from different sources
 # (pin vs. MMCM) with no fixed phase relationship.  The only cross-domain
