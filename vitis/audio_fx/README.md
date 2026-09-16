@@ -24,7 +24,8 @@ Open a serial terminal on the PROG/UART port at 115200 baud.
 | `1` | Bit-crusher |
 | `2` | Echo |
 | `3` | Distortion |
-| `+` / `-` | Intensity up / down (0–3) |
+| `4` | Biquad filter (Phase 12) |
+| `+` / `-` | Intensity up / down (0–3); for the filter: LP/HP/BP/notch preset |
 | `m` | Mute / unmute |
 | `h` / `?` | Reprint the menu |
 
@@ -36,10 +37,10 @@ garbage on this board).
 
 | Bits | Meaning |
 |------|---------|
-| `[1:0]` | Effect select (0 bypass, 1 crusher, 2 echo, 3 distortion) |
-| `[3:2]` | Intensity |
-| `[4]` | `codec_ready` — releases the PL I2S datapath reset |
-| `[5]` | Unmute — drives `ac_muten` |
+| `[2:0]` | Effect select (0 bypass, 1 crusher, 2 echo, 3 distortion, 4 filter) |
+| `[4:3]` | Intensity (filter: 0 LP, 1 HP, 2 BP, 3 notch) |
+| `[5]` | `codec_ready` — releases the PL I2S datapath reset |
+| `[6]` | Unmute — drives `ac_muten` |
 
 ## Files
 

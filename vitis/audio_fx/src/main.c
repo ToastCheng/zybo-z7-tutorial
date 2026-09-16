@@ -8,10 +8,11 @@
 //   1. Configures the SSM2603 codec over the PS I2C1 controller (routed
 //      through EMIO to the PL codec pins).
 //   2. Writes a 32-bit control word to the PL through AXI GPIO:
-//        [1:0] effect select (0 bypass, 1 crusher, 2 echo, 3 distortion)
-//        [3:2] intensity (0..3)
-//        [4]   codec_ready (releases the PL I2S datapath reset)
-//        [5]   unmute (drives ac_muten)
+//        [2:0] effect select (0 bypass, 1 crusher, 2 echo, 3 distortion,
+//                             4 biquad filter)
+//        [4:3] intensity (0..3; biquad: 0 LP, 1 HP, 2 BP, 3 notch)
+//        [5]   codec_ready (releases the PL I2S datapath reset)
+//        [6]   unmute (drives ac_muten)
 //   3. Runs a UART menu (115200 baud) so the effect can be changed live
 //      from a terminal: 0-3 select, +/- intensity, m mute.
 //
@@ -33,10 +34,10 @@
 #define I2C_CLOCK_HZ    100000  // 100 kHz standard mode
 
 // AXI GPIO control-word bits.
-#define CTRL_FX_MASK    0x03
-#define CTRL_INTENSITY  2
-#define CTRL_READY      (1u << 4)
-#define CTRL_UNMUTE     (1u << 5)
+#define CTRL_FX_MASK    0x07
+#define CTRL_INTENSITY  3
+#define CTRL_READY      (1u << 5)
+#define CTRL_UNMUTE     (1u << 6)
 
 // SSM2603 configuration for I2S 16-bit playback/record at 44.1 kHz.
 // Each entry packs the two bytes sent on the bus:
@@ -57,7 +58,10 @@ static const u16 codec_lut[] = {
 };
 #define CODEC_LUT_SIZE  (sizeof(codec_lut) / sizeof(codec_lut[0]))
 
-static const char *fx_names[] = { "bypass", "bit-crusher", "echo", "distortion" };
+static const char *fx_names[] = { "bypass", "bit-crusher", "echo", "distortion",
+                                  "filter" };
+static const char *filt_names[] = { "low-pass", "high-pass", "band-pass",
+                                    "notch" };
 
 static XIicPs i2c;
 static XGpio  gpio;
@@ -85,8 +89,13 @@ static void update_control(void)
              | ((intensity & 0x3) << CTRL_INTENSITY)
              | CTRL_READY | CTRL_UNMUTE;
     XGpio_DiscreteWrite(&gpio, 1, ctrl);
-    xil_printf("-> effect %d (%s), intensity %d\r\n",
-               (int)fx_sel, fx_names[fx_sel], (int)intensity);
+    if (fx_sel == 4) {
+        xil_printf("-> effect %d (%s), preset %s\r\n",
+                   (int)fx_sel, fx_names[fx_sel], filt_names[intensity]);
+    } else {
+        xil_printf("-> effect %d (%s), intensity %d\r\n",
+                   (int)fx_sel, fx_names[fx_sel], (int)intensity);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -138,9 +147,9 @@ static int codec_init(void)
 
 static void print_menu(void)
 {
-    xil_printf("\r\n--- Phase 11: PS-controlled audio effects ---\r\n");
-    xil_printf("  0 bypass | 1 bit-crusher | 2 echo | 3 distortion\r\n");
-    xil_printf("  +/- intensity | m mute/unmute\r\n");
+    xil_printf("\r\n--- Phase 11/12: PS-controlled audio effects ---\r\n");
+    xil_printf("  0 bypass | 1 bit-crusher | 2 echo | 3 distortion | 4 filter\r\n");
+    xil_printf("  +/- intensity (filter: LP/HP/BP/notch preset) | m mute/unmute\r\n");
 }
 
 int main(void)
@@ -163,7 +172,7 @@ int main(void)
         char c = (char)XUartPs_RecvByte(UART_BASEADDR);
 
         switch (c) {
-        case '0': case '1': case '2': case '3':
+        case '0': case '1': case '2': case '3': case '4':
             fx_sel = (u32)(c - '0');
             update_control();
             break;
