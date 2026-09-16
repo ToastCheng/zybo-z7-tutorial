@@ -229,6 +229,7 @@ The project is built in small, self-contained phases. Each phase adds one new co
 | 9 | PS Hello | First use of the ARM PS: bare-metal app, EMIO GPIO, UART | `top_ps_hello` |
 | 10 | Audio Effects | BRAM delay line, saturation, bit manipulation | `top_audio_fx` |
 | 11 | PS Audio Effects | PS I2C codec config, AXI GPIO control, UART menu | `top_audio_fx_soc` |
+| 12 | Biquad Filter Effect | Fixed-point IIR filtering, DSP48 multipliers | `top_audio_fx_soc` (extended) |
 
 Each phase has:
 
