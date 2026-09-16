@@ -25,7 +25,9 @@ Open a serial terminal on the PROG/UART port at 115200 baud.
 | `2` | Echo |
 | `3` | Distortion |
 | `4` | Biquad filter (Phase 12) |
-| `+` / `-` | Intensity up / down (0–3); for the filter: LP/HP/BP/notch preset |
+| `5` | Mod-delay: chorus/flanger/vibrato/slow chorus (Phase 13) |
+| `6` | Tremolo (Phase 13) |
+| `+` / `-` | Intensity up / down (0–3); per-effect preset |
 | `m` | Mute / unmute |
 | `h` / `?` | Reprint the menu |
 
@@ -37,8 +39,8 @@ garbage on this board).
 
 | Bits | Meaning |
 |------|---------|
-| `[2:0]` | Effect select (0 bypass, 1 crusher, 2 echo, 3 distortion, 4 filter) |
-| `[4:3]` | Intensity (filter: 0 LP, 1 HP, 2 BP, 3 notch) |
+| `[2:0]` | Effect select (0 bypass, 1 crusher, 2 echo, 3 distortion, 4 filter, 5 mod-delay, 6 tremolo) |
+| `[4:3]` | Intensity (per-effect preset) |
 | `[5]` | `codec_ready` — releases the PL I2S datapath reset |
 | `[6]` | Unmute — drives `ac_muten` |
 
