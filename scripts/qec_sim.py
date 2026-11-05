@@ -17,7 +17,8 @@ if not (ROOT / "qec/lut.mem").is_file():
     raise SystemExit("Generate the real qec/lut.mem first; no fallback LUT is used")
 sources = ["rtl/common/sync.sv", "rtl/common/uart_rx.sv", "rtl/common/uart_tx.sv",
            "rtl/common/qec_decoder.sv", "rtl/top/top_qec_uart.sv",
-           "rtl/tb/tb_qec_decoder.sv", "rtl/tb/tb_qec_uart.sv"]
+           "rtl/tb/tb_qec_decoder.sv", "rtl/tb/tb_qec_uart.sv",
+           "rtl/tb/tb_uart_rx_framing.sv"]
 def run(tool, *args):
     result = subprocess.run([str(BIN/tool), *args], cwd=BUILD,
                             text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -29,7 +30,7 @@ if NETLIST:
     sources = ["build/qec_core/post_synth.v", "rtl/tb/tb_qec_decoder.sv"]
     sources.append(str(BIN.parent / "data/verilog/src/glbl.v"))
 run("xvlog", "--sv", *(str(ROOT/s) for s in sources))
-for tb in (["tb_qec_decoder"] if NETLIST else ["tb_qec_decoder", "tb_qec_uart"]):
+for tb in (["tb_qec_decoder"] if NETLIST else ["tb_uart_rx_framing", "tb_qec_decoder", "tb_qec_uart"]):
     extra = ["work.glbl", "-L", "unisims_ver"] if NETLIST else []
     run("xelab", "work."+tb, *extra, "--snapshot", tb, "--debug", "typical")
     output = run("xsim", tb, "--runall", "--log", tb+".log")

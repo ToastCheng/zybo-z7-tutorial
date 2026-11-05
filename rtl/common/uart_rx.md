@@ -28,7 +28,11 @@ To avoid sampling near bit transitions, the receiver waits **1.5 bit periods** a
 
 ### False-start rejection
 
-If the line is no longer low when it is time to sample the first data bit, the receiver discards the frame and returns to idle. This filters out very short noise glitches.
+If the line is no longer low at the **start-bit center**, the receiver discards the candidate and returns to idle. This filters out very short noise glitches.
+
+### Stop-bit validation and recovery
+
+One bit period after sampling data bit 7, the receiver samples the synchronized stop bit. Only HIGH produces a one-cycle `valid` pulse; LOW silently discards the byte. Both cases return to IDLE. There is no added reset or framing-error port. Consumers must ignore `data` unless `valid` is high: the shift register still contains sampled bits from rejected frames. After an idle interval, a subsequent well-formed frame is received normally; arbitrary break/continuous-low resynchronization is not guaranteed.
 
 ## Parameters
 
@@ -62,4 +66,4 @@ uart_rx #(
 
 ## Testing
 
-See `rtl/tb/tb_uart_rx.sv`. It generates a UART frame from the testbench and verifies that `data` and `valid` match the sent byte.
+See `rtl/tb/tb_uart_rx.sv` for nominal byte reception. Run `python scripts/qec_sim.py` for the paired [`tb_uart_rx_framing`](../tb/tb_uart_rx_framing.md) regression: an incoming `0xA5` with a LOW stop bit must produce no pulse, then a valid `0x3C` after idle must produce exactly one single-cycle pulse without reset.

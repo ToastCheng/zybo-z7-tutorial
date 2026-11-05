@@ -94,9 +94,9 @@ module uart_rx #(
 
             STOP: begin
                 if (timer == '0) begin
-                    // A complete frame has been received.
+                    // Accept only a HIGH stop bit; discard malformed frames.
                     state     <= IDLE;
-                    valid_reg <= 1'b1;
+                    valid_reg <= rx_sync;
                 end else begin
                     timer <= timer - 1'b1;
                 end
