@@ -34,6 +34,31 @@ def test_graph_export_is_roundtrippable_and_scales(tmp_path):
         assert [(v&((1<<vb)-1),(v>>vb)&((1<<vb)-1),v>>(2*vb)) for v in words]==g['edges']
         assert target.with_suffix('.json').exists()
 
+def test_surface_framing_rejects_old_width_and_bad_responses():
+    path=ROOT/'qec/surface/host.py'
+    assert path.exists(), 'surface physical host is missing'
+    spec=importlib.util.spec_from_file_location('surface_host',path)
+    h=importlib.util.module_from_spec(spec);spec.loader.exec_module(h)
+    from functools import reduce
+    from operator import xor
+    import pytest
+    packet=h.request(9,0x123456)
+    assert packet[:6]==bytes([0xc3,9,3,0x56,0x34,0x12]) and reduce(xor,packet)==0
+    response=bytes([0x3c,9,0,1,0x11,0x80,1,0]);response+=bytes([reduce(xor,response)])
+    assert h.parse(response,9)==(1,98321)
+    with pytest.raises(ValueError):h.request(9,1<<24)
+    with pytest.raises(ValueError):h.parse(response[:-1]+bytes([response[-1]^1]),9)
+    with pytest.raises(ValueError):h.parse(response,10)
+
+def test_surface_host_requires_explicit_physical_target():
+    path=ROOT/'qec/surface/host.py'
+    spec=importlib.util.spec_from_file_location('surface_host',path)
+    h=importlib.util.module_from_spec(spec);spec.loader.exec_module(h)
+    assert hasattr(h,'main'), 'physical surface entry point is missing'
+    import subprocess
+    result=subprocess.run([sys.executable,str(path),'--shots','1'],capture_output=True,text=True)
+    assert result.returncode==2 and '--port' in result.stderr and '--board-id' in result.stderr
+
 def test_union_find_peeling_cancels_syndrome_and_tracks_observable():
     m=module()
     assert hasattr(m,'decode'), 'union-find/peeling reference is missing'
