@@ -1,0 +1,2 @@
+# Run metadata
+Records exact seed/circuit/noise/version information, LUT SHA256 and host platform. FPGA measured is explicitly false. timing_summary contains p05/median/p95 observed timings, not confidence intervals. Chart commands and limitations are in experiments.md. The corresponding charts noise_sweep.png and software_performance.png are local ignored artifacts for copying to the research report.

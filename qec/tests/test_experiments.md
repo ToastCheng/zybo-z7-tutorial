@@ -1,0 +1,2 @@
+# Experiment acceptance test
+Run `qec/.venv/bin/python -m pytest qec/tests/test_experiments.py -q`. A subprocess executes the complete CLI at 2000 shots/point. The test independently resamples all seeded noisy circuits, checks all 21 baseline/error rows and Wilson containment, validates exact known interval values, raw timing methods, metadata and PNG artifacts. Initial RED asserted missing experiments; GREEN also corrected floating-point cancellation at the zero-error Wilson endpoint.

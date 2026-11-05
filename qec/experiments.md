@@ -1,0 +1,6 @@
+# Reproducible experiments tutorial
+Run `qec/.venv/bin/python qec/experiments.py --shots 100000 --seed 20261105 --out qec/results` from the repository root. Seven circuit noise points use seeds base+i; each evaluates identity/no correction, noise-matched PyMatching, and the fixed p=0.001 LUT on the SAME shots. Each row includes a marginal 95% Wilson binomial interval. These intervals are not a paired significance test. No observed errors does not mean zero true error rate.
+
+Batch benchmarks perform seven warmed calls on 100000 shots, report elapsed time and amortized ns/shot. Single-call benchmarks record 2000 individual `matching.decode` and scalar LUT access calls. Sampling, packing and transport are outside timing. Clock/Python overhead remains; tiny LUT times reflect cached host memory, not FPGA logic. Percentiles describe measured timing spread, not confidence intervals. Batch throughput must not be reported as single-shot latency.
+
+Seeds reproduce shot counts with the pinned Stim version and same sample calls; timings are machine/load dependent. JSON records versions/platform/hash and false FPGA-measured flag. PNG charts are generated locally and ignored; CSV/JSON are committed. Repetition d3/r3 is a fixed finite window handling one error type, not full QEC or streaming decoding.
