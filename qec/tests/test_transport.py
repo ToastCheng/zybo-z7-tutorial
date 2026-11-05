@@ -26,6 +26,20 @@ def test_loopback_heldout_circuits_and_cli(tmp_path):
     assert report['logical_errors'] == int(np.sum(table[decoder.pack(detectors)] != observables[:, 0]))
 
 
+def test_expired_response_is_not_accepted():
+    import time
+    import pytest
+    import transport
+    class LateEndpoint:
+        def write(self, data):
+            return len(data)
+        def read(self, size):
+            time.sleep(0.01)
+            return bytes([90, 7, 1, 52, 18, 122])
+    with pytest.raises(TimeoutError):
+        transport.exchange(LateEndpoint(), 7, 129, timeout=0.001)
+
+
 def test_partial_response_and_exact_request():
     assert importlib.util.find_spec('transport') is not None, 'transport missing'
     import transport

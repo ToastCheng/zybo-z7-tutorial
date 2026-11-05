@@ -19,7 +19,10 @@ def exchange(endpoint, seq, syndrome, timeout=1.0):
         raise IOError('short request write')
     parser = Parser()
     while time.monotonic() < deadline:
-        frames = parser.feed(endpoint.read(64))
+        data = endpoint.read(64)
+        if time.monotonic() >= deadline:
+            break
+        frames = parser.feed(data)
         if frames:
             if len(frames) != 1 or frames[0][0] != seq:
                 raise ValueError('response sequence mismatch or duplicate')
