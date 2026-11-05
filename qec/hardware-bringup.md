@@ -1,6 +1,6 @@
 # USB-only physical QEC bring-up
 
-## Verified and blocked boundaries
+## Verified physical boundaries
 
 The board is actually connected: FTDI `0403:6010`, Digilent target
 `localhost:3121/xilinx_tcf/Digilent/210351BE7C3EA`, Zynq `xc7z010_1`.
@@ -14,15 +14,37 @@ INIT_B internal/pin = 1, CRC_ERROR = 0, IDCODE_ERROR = 0, EOS = 1.
 This is **configuration status**, not full configuration-memory readback.
 No flash, SD card, QSPI or persistent boot image was modified.
 
-The first Python serial transaction command was blocked by the execution
-tool because its approval prompt timed out. The tool explicitly states the
-command did not run and prohibits retrying/rephrasing without renewed approval.
-Thus **zero physical decoder transactions are verified**. Do not interpret
-successful configuration, simulation or the unexercised runner as a successful
-board corpus. Serial approval, exhaustive hardware checks, Stim replay and
-measured host/USB latency remain outstanding.
+The earlier approval timeout is preserved in the historical
+`results/hardware-20261105-usb-blocked/` snapshot. After explicit user approval,
+the real serial probe returned request `a5013793`, reply `5a0101020058`
+(sequence 1, prediction 1, measured cycles 2). Two full physical runs then
+succeeded; they are not loopback or pseudo-terminal results.
 
-## Reproduction after serial approval
+- `results/hardware-approved-run/`: all 256 syndromes, 8192 real Stim
+  shots at p=.01 / seed 20261105, and three malformed-traffic recovery checks.
+  Zero hardware-vs-LUT or hardware-vs-PyMatching mismatches. Observable
+  errors 51/8192 (0.6226%; 95% Wilson 0.4738–0.8176%) versus identity 458/8192.
+- `results/hardware-after-reset/`: after volatile PL reprogramming and
+  processor reset/relaunch, all 256 syndromes, 4096 p=.001 / seed 20261106
+  shots and the same three recovery checks passed. Observable errors 0/4096
+  versus identity 20/4096. Zero observed errors is not zero underlying risk:
+  the 95% Wilson upper bound is 0.09370%.
+- In total, 12806 captured successful request/reply transactions:
+  12288 Stim shots, 512 exhaustive checks, six recovery requests. The single
+  preliminary probe is separately recorded above and excluded from that total.
+- Every captured reply reported 2 measured PL cycles. Both physical runs
+  rejected bad checksum, garbage and an abandoned partial frame, then
+  accepted the next good request.
+
+Independent validation re-created the exact seeded Stim syndromes/observables
+and PyMatching references, parsed every archived request/reply/checksum,
+checked every prediction against the original LUT, and verified all 14
+original artifact hashes in each manifest. Exhaustive rows use LUT values
+as placeholder observables; only Stim rows define logical-error statistics.
+The source revision is ae3362bea8b61564ee7bc0623d163a743a20a2bc; the only
+then-untracked files were output directories, not modified source.
+
+## Reproduction
 
 From repository root:
 
@@ -33,15 +55,17 @@ $VIVADO/vivado -mode batch -source scripts/build_soc.tcl -tclargs top_qec_soc > 
 $VITIS/vitis -s vitis/qec/build_app.py > build/qec_firmware_build.log 2>&1
 $VITIS/xsct scripts/run_soc.tcl build/qec_soc.bit build/vitis_ws/qec_app/build/qec_app.elf build/qec_soc.xsa > build/qec_program.log 2>&1
 $VIVADO/vivado -mode batch -source scripts/qec_readback.tcl > build/qec_readback.log 2>&1
-qec/.venv/bin/python qec/hardware_run.py --port /dev/ttyUSB1 --board-id 210351BE7C3EA --shots 8192 --noise .01 --seed 20261105 --out qec/results/hardware-approved-run
+qec/.venv/bin/python qec/hardware_run.py --port /dev/ttyUSB1 --board-id 210351BE7C3EA --shots 8192 --noise .01 --seed 20261105 --out qec/results/hardware-reproduction-01
 ```
 
-The last command must receive renewed tool permission; it has **not run**.
-Use a new output directory every time. A successful run must include all
-256 LUT syndromes, 8192 real Stim shots, raw request/reply hex, checksum and
-partial-frame timeout recovery, comparisons against the fixed LUT and
-PyMatching, observable failures, and a manifest with source/artifact hashes.
-Its hardware main may reveal issues not covered by unit or RTL tests.
+Use a new output directory every time; execution may require approving the
+terminal permission card. The completed runs contain all 256 LUT syndromes,
+real Stim shots, raw request/reply hex, malformed-traffic recovery, fixed-LUT
+and matching comparisons, observables and source/artifact hashes. To repeat
+the reset test, execute run_soc.tcl and qec_readback.tcl again before running
+with `--shots 4096 --noise .001 --seed 20261106` into another fresh directory.
+Reset coverage is full volatile reload/processor restart, not an isolated
+in-flight reset or power cycle. No persistent boot image is written.
 
 ## Timing boundaries
 
@@ -59,10 +83,24 @@ The bridge contains a real free-running FCLK timestamp difference and
 reports acceptance to first out_valid availability, subtracting the one
 observer cycle needed to capture the registered result. Independent RTL
 edge checks yield **2 cycles = 20 ns at configured 100 MHz**, while status
-capture takes 3 cycles = 30 ns. These are **simulation-verified boundaries,
-not yet a board timing measurement**. PS polling, AXI latency and USB/UART
-roundtrip are separate. Firmware ignores the old core's constant schedule
-field. This is finite-shot repetition-code observable prediction only.
+capture takes 3 cycles = 30 ns. The real board returned the instrumented
+2-cycle count for every captured transaction. Conversion to nanoseconds uses
+the configured clock, not an oscilloscope frequency measurement.
+
+Inclusive host/USB/UART/ARM/AXI Stim roundtrip timing:
+- 8192-shot p=.01 run: median 15.858794 ms, p99 16.558837 ms,
+  minimum 14.912443 ms, maximum 16.957489 ms.
+- 4096-shot p=.001 run after reload: median 15.876542 ms, p99 16.573238 ms,
+  minimum 14.787078 ms, maximum 16.846082 ms.
+
+The 10-byte 115200-baud 8N1 wire-time lower bound is 0.868056 ms; the measured
+roundtrip includes USB buffering and scheduling. No FTDI-latency attribution
+or tuning was independently tested. Do not compare 20 ns core timing with
+CPU end-to-end latency or infer a quantum feedback deadline. Firmware ignores
+the old core's constant schedule field. No initiation-interval benchmark,
+isolated in-flight reset, deliberate PS UART stop-bit fault, adaptive quantum
+feedforward or physical quantum correction was tested. This is finite-shot
+simulated repetition-code observable prediction on real classical hardware.
 
 ## Tests
 
