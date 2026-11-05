@@ -1,0 +1,65 @@
+{
+  "mode": "physical-surface-unweighted-union-find-peeling",
+  "fpga_measured": true,
+  "board_id": "210351BE7C3EA",
+  "port": "/dev/ttyUSB1",
+  "distance": 3,
+  "rounds": 3,
+  "basis": "z",
+  "detectors": 24,
+  "edges": 78,
+  "shots": 4096,
+  "noise": 0.01,
+  "seed": 20261109,
+  "transactions": 4268,
+  "uf_mismatches": 0,
+  "pymatching_disagreements": 209,
+  "logical_errors": 304,
+  "logical_error_wilson95": [
+    0.06658406913877092,
+    0.08265132568468848
+  ],
+  "pymatching_logical_errors": 237,
+  "identity_errors": 811,
+  "fclk_hz": 100000000,
+  "cycles_min": 153,
+  "cycles_median": 831.0,
+  "cycles_max": 2227,
+  "host_stim_ns_median": 15843418.0,
+  "host_stim_ns_p99": 16333395.100000001,
+  "recovery": [
+    {
+      "case": "checksum",
+      "bad_tx_hex": "c35a030000009b",
+      "rejected_rx_hex": "",
+      "recovered_rx_hex": "3ca700009900000002"
+    },
+    {
+      "case": "garbage",
+      "bad_tx_hex": "0011ff",
+      "rejected_rx_hex": "",
+      "recovered_rx_hex": "3ca80000990000000d"
+    },
+    {
+      "case": "partial_timeout",
+      "bad_tx_hex": "c35a03",
+      "rejected_rx_hex": "",
+      "recovered_rx_hex": "3ca90000990000000c"
+    },
+    {
+      "case": "bad_length",
+      "bad_tx_hex": "c35a1100",
+      "rejected_rx_hex": "",
+      "recovered_rx_hex": "3caa0000990000000f"
+    }
+  ],
+  "controls": [
+    {
+      "kind": "pl_reset",
+      "tx_hex": "c35b0098",
+      "rx_hex": "3c5b00000000000067"
+    }
+  ],
+  "timing_boundary": "instrumented core acceptance to result availability; excludes PS/AXI/USB",
+  "limitations": "Unweighted serial finite-window union-find, not MWPM/streaming/near-linear hardware latency or physical quantum correction. Only d3 Z is programmed here; d5 and X are RTL simulation evidence."
+}
