@@ -26,6 +26,57 @@ def test_loopback_heldout_circuits_and_cli(tmp_path):
     assert report['logical_errors'] == int(np.sum(table[decoder.pack(detectors)] != observables[:, 0]))
 
 
+def test_pyserial_pty_cli_marks_output_as_unmeasured_hardware():
+    import os
+    import select
+    import threading
+    import time
+    import json
+    import subprocess
+    import decoder
+    import transport
+    master, slave = os.openpty()
+    slave_name = os.ttyname(slave)
+    table = decoder.make_lut()
+    errors = []
+    def serve():
+        pending = bytearray()
+        try:
+            for _ in range(32):
+                deadline = time.monotonic() + 10
+                while len(pending) < 4:
+                    if time.monotonic() > deadline:
+                        raise TimeoutError('PTY request deadline')
+                    if select.select([master], [], [], 0.05)[0]:
+                        pending.extend(os.read(master, 4096))
+                packet = bytes(pending[:4])
+                del pending[:4]
+                assert packet == transport.request(packet[1], packet[2])
+                data = bytes([90, packet[1], int(table[packet[2]]), 2, 0])
+                from functools import reduce
+                from operator import xor
+                reply = data + bytes([reduce(xor, data)])
+                os.write(master, reply[:2])
+                os.write(master, reply[2:])
+        except BaseException as error:
+            errors.append(error)
+    worker = threading.Thread(target=serve, daemon=True)
+    worker.start()
+    try:
+        result = subprocess.run([sys.executable, 'qec/host.py', '--mode', 'serial', '--port', slave_name,
+                                 '--shots', '32', '--seed', '90210'], capture_output=True, text=True, check=True, timeout=15)
+        worker.join(timeout=2)
+        assert not errors
+        report = json.loads(result.stdout)
+        assert report['mode'] == 'serial-unverified-hardware'
+        assert report['fpga_measured'] is False
+        assert report['prediction_mismatches'] == 0
+        assert report['response_cycles_min'] == report['response_cycles_max'] == 2
+    finally:
+        os.close(master)
+        os.close(slave)
+
+
 def test_expired_response_is_not_accepted():
     import time
     import pytest

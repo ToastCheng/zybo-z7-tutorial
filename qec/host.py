@@ -43,7 +43,7 @@ def main():
         if args.mode == 'serial':
             endpoint.close()
     print(json.dumps(dict(mode='software-loopback' if args.mode == 'loopback' else 'serial-unverified-hardware',
-        shots=args.shots, seed=args.seed, noise=args.noise,
+        fpga_measured=False, shots=args.shots, seed=args.seed, noise=args.noise,
         prediction_mismatches=int(np.sum(np.asarray(predictions) != matching.decode_batch(detectors)[:, 0])),
         logical_errors=int(np.sum(np.asarray(predictions) != observables[:, 0])),
         identity_errors=int(np.sum(observables)),
