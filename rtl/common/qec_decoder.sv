@@ -12,7 +12,7 @@ module qec_decoder #(
     output logic prediction,
     output logic [15:0] cycles
 );
-    (* rom_style="distributed" *) logic lut [0:255];
+    (* rom_style="distributed" *) logic [0:0] lut [0:255];
     initial $readmemh(LUT_FILE, lut);
     typedef enum logic [1:0] {IDLE, READ, RESULT, HOLD} state_t;
     state_t state=IDLE;

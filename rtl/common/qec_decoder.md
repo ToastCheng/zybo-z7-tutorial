@@ -6,7 +6,7 @@
 
 All ports are synchronous to `clk`. Active-high synchronous `rst` aborts work and clears outputs. At an edge with `in_valid && in_ready`, the core captures `syndrome`. At the next edge it reads the ROM; at the second edge it registers `prediction` and asserts `out_valid`. Thus `cycles=2` means rising-edge accept-to-result interval, excluding any input wait, response stall or UART latency. The testbench independently counts those edges. At the default 125 MHz this interval is 16 ns; this is a design interval, not a host end-to-end deadline guarantee.
 
-`out_valid` and the payload stay stable until `out_ready`; `in_ready` is low throughout processing and result holding. There is one outstanding shot, no queue and no simultaneous output retirement/input acceptance. `LUT_FILE` defaults to `qec/lut.mem`, loaded by `$readmemh`; there is no fallback or stub ROM. Reset gates both handshakes. The ROM itself is not reset.
+`out_valid` and the payload stay stable until `out_ready`; `in_ready` is low throughout processing and result holding. There is one outstanding shot, no queue and no simultaneous output retirement/input acceptance. `LUT_FILE` defaults to `qec/lut.mem`, loaded by `$readmemh`; there is no fallback or stub ROM. Reset gates both handshakes. The ROM itself is not reset. Its words use the packed one-bit type `logic [0:0]` because Vivado synthesis ignores `$readmemh` on a scalar unpacked memory. The dedicated build promotes that diagnostic to an error; `python scripts/qec_sim.py --netlist` checks the synthesized truth table.
 
 ## Run
 

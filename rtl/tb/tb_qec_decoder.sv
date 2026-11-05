@@ -9,7 +9,7 @@ module tb_qec_decoder;
     qec_decoder dut(.*);
     initial begin
         $readmemh("qec/lut.mem", expected);
-        repeat(3) @(negedge clk);
+        repeat(20) @(negedge clk);
         rst=0; #1;
         for(int i=0;i<256;i++) begin
             if(!in_ready) $fatal(1,"not ready at input %0d",i);
