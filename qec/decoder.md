@@ -1,0 +1,2 @@
+# Fixed decoder tutorial
+Run `qec/.venv/bin/python qec/decoder.py` from the repository root to regenerate `qec/lut.mem`. Stim generates repetition_code:memory distance 3, rounds 3 with all four circuit noise channels set to p=0.001. Its 8 detector bits are packed little endian into one byte. PyMatching predicts the single logical observable for every possible syndrome. The table is a fixed-noise predictor, not a table trained on held-out shots.
