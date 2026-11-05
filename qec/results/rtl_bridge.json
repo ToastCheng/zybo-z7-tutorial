@@ -1,0 +1,16 @@
+{
+  "mode": "rtl-uart-simulation",
+  "fpga_measured": false,
+  "shots": 4096,
+  "seed": 314159,
+  "noise": 0.03,
+  "prediction_mismatches": 0,
+  "pymatching_disagreements": 0,
+  "logical_errors": 222,
+  "identity_errors": 668,
+  "received_frames": 4096,
+  "cycles": [
+    2
+  ],
+  "timing_note": "Functional RTL acceptance-to-result cycles only; no UART/board latency measurement"
+}

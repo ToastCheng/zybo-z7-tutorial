@@ -1,0 +1,2 @@
+# Opt-in RTL integration test
+`QEC_RTL=1 qec/.venv/bin/python -m pytest qec/tests/test_rtl_bridge.py -q` runs actual Vivado tools and HDL; without the flag this expensive external-tool test is explicitly skipped. Initial RED was missing bridge; GREEN demonstrated 256 framed Stim shots crossing real UART RTL. A second RED/GREEN slice added raw CSV export and independently regenerated each detector/observable row to prove the saved corpus. The current RTL returns 2 acceptance-to-result cycles; no FPGA is connected.
