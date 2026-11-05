@@ -1,0 +1,5 @@
+# Decoder simulation tutorial
+
+`tb_qec_decoder.sv` drives an 8 ns clock, resets the DUT, and enumerates all 256 packed detector vectors. It separately loads the real `qec/lut.mem` as the scoreboard, rejects early results, checks the result two rising-edge intervals after acceptance and verifies the reported cycle count. Four-state comparisons reject unknown predictions.
+
+Run `python scripts/qec_sim.py` from repository root. A successful run prints `PASS exhaustive 256 LUT entries, exactly two cycles`; failures use `$fatal` and a watchdog limits hangs. This is a non-synthesizable, portless testbench. Its shared LUT checks RTL indexing and timing, not whether PyMatching generated the scientifically correct reference; host-side tests cover that separate concern.
