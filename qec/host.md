@@ -11,10 +11,12 @@ The current PL design requires an **external 3.3 V USB–UART adapter**, configu
 | host RX (adapter RXD) | Pmod JE2, FPGA package pin W16 | `uart_tx` output |
 | GND | Board/Pmod GND | Common ground |
 
-Use 3.3 V logic, **not 5 V TTL or RS-232 voltage levels**. The onboard **PROG/UART** USB serial connection goes to the **PS UART**, not this PL UART design. It may provide JTAG programming access, but opening its serial port will not reach this endpoint. USB-only serial use would require a PS/PL bridge that is not implemented here.
+Use 3.3 V logic, **not 5 V TTL or RS-232 voltage levels**. The onboard **PROG/UART** USB serial connection goes to **PS UART1**, not this PL-only UART design. The new `top_qec_soc` path bridges PS UART1 to PL through AXI GPIO; it needs no adapter. See [hardware-bringup.md](hardware-bringup.md) for build/program evidence and current approval blocker.
 
-This is **not a turnkey board image**. The report-only `scripts/qec_build.tcl` flow has generated **no QEC bitstream** and does not program hardware. The routed UART report still contains DRC warning `ZPS7-1` (PS7 block required); PS configuration and hardware bring-up remain unresolved. Passing simulation/routed timing is not evidence of physical UART operation.
+The separate report-only `scripts/qec_build.tcl` flow still produces no bitstream; use `scripts/build_soc.tcl -tclargs top_qec_soc` for the real PS+PL image. The actual board was successfully programmed and configuration status read back, but serial execution approval timed out before the first transaction.
 
-## Later board run
+## USB-only physical corpus
 
-Only after resolving the PS configuration/DRC bring-up issue, generating and separately programming a suitable QEC bitstream, and checking the adapter wiring above, run `qec/.venv/bin/python qec/host.py --mode serial --port /dev/ttyUSB1 --baud 115200 --shots 1000 --seed 90210 --timeout 1`. Replace the example port with the external adapter's actual port, not the onboard PS serial port. Explicit port is mandatory; the CLI never discovers or opens a board by default. pyserial OS errors are fatal. No board is attached during current experiments. Serial roundtrip includes host scheduling and UART; reported RTL cycles measure acceptance-to-result only. A mismatched-noise table may differ from noise-matched PyMatching.
+After renewed serial tool approval, run the physical-only [hardware_run.py](hardware_run.py) using the documented explicit board ID and serial port. It archives real request/reply bytes, observable/reference comparisons and source/bitstream hashes. It has not yet run on hardware; only its accounting helper is unit-tested. `host.py` intentionally retains conservative generic `serial-unverified-hardware` provenance because a supplied port alone cannot certify board identity.
+
+For an independently programmed **PL-only UART** plus correctly wired external adapter, the generic client remains `qec/.venv/bin/python qec/host.py --mode serial --port <adapter-port> --baud 115200 --shots 1000 --seed 90210 --timeout 1`. Explicit port is mandatory. No auto-discovery occurs. Roundtrip includes host/USB/UART/ARM/AXI overhead; core cycles exclude these and do not establish a system feedback deadline. A mismatched-noise table may differ from noise-matched PyMatching.
