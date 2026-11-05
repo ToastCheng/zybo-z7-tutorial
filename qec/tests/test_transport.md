@@ -1,0 +1,2 @@
+# Protocol tests
+Run `qec/.venv/bin/python -m pytest qec/tests/test_transport.py -q`. Vertical RED/GREEN slices added partial response parsing, exchange validation, and held-out loopback CLI. Tests use real Stim shots and actual subprocess CLI. A deterministic byte endpoint tests partial reads, checksum failure, invalid prediction, stale sequence and truncated-response timeout. Garbage input proves bounded retained parser memory. These tests do not measure FPGA behavior.
