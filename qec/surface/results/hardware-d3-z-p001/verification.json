@@ -1,0 +1,19 @@
+{
+  "validation": "independent artifact/frame/Stim/correction-parity replay passed",
+  "original_manifest_hashes_verified": 19,
+  "decode_rows_verified": 4268,
+  "reset_controls_verified": 1,
+  "stim_shots_verified": 4096,
+  "source_revision": "bfefc702bd8fc844d6a7bf5db76b10016c0f25aa",
+  "seeded_detectors_and_observables_recreated": true,
+  "pymatching_predictions_recreated": true,
+  "every_frame_reparsed": true,
+  "every_correction_cancels_syndrome": true,
+  "every_prediction_matches_uf_reference": true,
+  "uf_errors": 4,
+  "pymatching_errors": 4,
+  "identity_errors": 108,
+  "pymatching_disagreements": 4,
+  "timing_clock_note": "Nanosecond conversion uses configured100MHz, not oscilloscope frequency",
+  "manifest_note": "README and this addendum are not in the original manifest hash set"
+}
