@@ -1,5 +1,7 @@
 # Stim-to-endpoint repetition-code experiment
 
+Start with [QUICKSTART.md](QUICKSTART.md) for a step-by-step explanation, a manual single-window decode, and the complete simulation-to-board flow for both samples.
+
 For the new **algorithmic surface-code version**, see [surface/README.md](surface/README.md): parameterized union-find/peeling RTL, d3 Z actual-board results and d5/X RTL simulation. It uses the same onboard USB/PS infrastructure but a different decoder and widened framing. The latest physical tests leave the **surface image loaded**; reprogram the preserved repetition image before using the repetition host/protocol below.
 
 See [decoder.md](decoder.md) for circuit/LUT generation, [transport.md](transport.md) for exact UART framing and failure behavior, [host.md](host.md) for software loopback and later board CLI, and [experiments.md](experiments.md) for reproducible science and software benchmarks. Every source/test/config has a paired tutorial.

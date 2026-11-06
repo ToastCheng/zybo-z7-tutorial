@@ -25,6 +25,8 @@ The goal is to learn digital design hands-on, starting from a blinking LED and b
 
 ## Getting Started
 
+For the QEC samples, start with [QEC quick start: manually decode a complete window](qec/QUICKSTART.md). It covers a single software/FPGA transaction, RTL simulation, USB-only SoC loading, and complete experiment capture.
+
 1. Clone this repository.
 2. Connect the Zybo Z7-10 to your computer via the **PROG/UART** micro-USB port.
 3. Set the board power switch to **USB** if you are powering from USB.

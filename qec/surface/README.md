@@ -1,5 +1,7 @@
 # Algorithmic surface-code decoder on Zybo
 
+For a guided first run, see [the QEC quick start](../QUICKSTART.md): inspect one noisy window, run RTL, load the board, and send the same window through the FPGA.
+
 This is a separate surface-code implementation beside the preserved repetition
 baseline. The USB/PS/AXI infrastructure is reused; the PL decoder is replaced by
 **parameterized serial half-edge union-find growth and spanning-forest peeling**.
