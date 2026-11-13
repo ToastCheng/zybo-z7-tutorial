@@ -1,0 +1,2 @@
+# Raw software timing samples
+Seven batch repeats per method; 2000 individually timed single-shot calls per method. Elapsed values are perf_counter_ns differences. Batch ns_per_shot divides by batch size; single values do not. Data excludes Stim generation, detector packing, transport and FPGA. Cached scalar LUT timing is not synthesizable hardware performance. See metadata.json for versions and summary quantiles.

@@ -1,0 +1,2 @@
+# Raw RTL corpus
+4096 actual Stim noisy repetition d3/r3 windows at p=.03, seed 314159. Each row records sequence (wraps every 256), little-endian syndrome, true observable, prediction from actual UART HDL response, and decoder cycle field. Reproduce with the rtl_bridge CLI documented alongside. Prediction XOR observable defines logical failure; cycles are simulated acceptance-to-result, not UART/host/board latency.

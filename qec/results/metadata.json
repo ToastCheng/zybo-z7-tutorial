@@ -1,0 +1,72 @@
+{
+  "seed": 20261105,
+  "shots_per_noise": 100000,
+  "noise_values": [
+    0.0001,
+    0.0003,
+    0.001,
+    0.003,
+    0.01,
+    0.03,
+    0.1
+  ],
+  "num_detectors": 8,
+  "distance": 3,
+  "rounds": 3,
+  "lut_noise": 0.001,
+  "circuit_generator": "repetition_code:memory",
+  "noise_channels": [
+    "after_clifford_depolarization",
+    "before_round_data_depolarization",
+    "before_measure_flip_probability",
+    "after_reset_flip_probability"
+  ],
+  "lut_sha256": "5b701c6d4b7a86f2331a380305758a3209afee1645c2e548b12f27952a3dc905",
+  "versions": {
+    "stim": "1.16.0",
+    "pymatching": "2.4.0",
+    "numpy": "2.5.4",
+    "matplotlib": "3.11.2",
+    "pyserial": "3.5",
+    "pytest": "9.2.0"
+  },
+  "python": "3.12.13",
+  "platform": "Linux-6.17.0-1025-oem-x86_64-with-glibc2.39",
+  "fpga_measured": false,
+  "confidence_interval": "95% Wilson marginal binomial",
+  "timing_clock": "perf_counter_ns",
+  "timing_summary": {
+    "lut_batch": {
+      "median_ns_per_shot": 0.41237,
+      "p05_ns_per_shot": 0.40030099999999996,
+      "p95_ns_per_shot": 0.421561,
+      "samples": 7
+    },
+    "lut_single": {
+      "median_ns_per_shot": 119.0,
+      "p05_ns_per_shot": 99.0,
+      "p95_ns_per_shot": 155.0,
+      "samples": 2000
+    },
+    "pymatching_batch": {
+      "median_ns_per_shot": 9.45368,
+      "p05_ns_per_shot": 9.292762999999999,
+      "p95_ns_per_shot": 10.046296,
+      "samples": 7
+    },
+    "pymatching_single": {
+      "median_ns_per_shot": 1535.0,
+      "p05_ns_per_shot": 1409.0,
+      "p95_ns_per_shot": 1862.05,
+      "samples": 2000
+    }
+  },
+  "limitations": [
+    "fixed shot window, not streaming",
+    "one error type, not full quantum error correction",
+    "software timing excludes sampling and transport",
+    "batch amortized cost is not single-shot latency",
+    "FPGA acceptance-to-result cycles are not UART latency",
+    "timing varies by host/load; seeds require same Stim version and sample calls"
+  ]
+}

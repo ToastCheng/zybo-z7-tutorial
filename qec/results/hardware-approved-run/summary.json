@@ -1,0 +1,61 @@
+{
+  "mode": "physical-zybo-ps-uart1-axi-gpio-pl",
+  "fpga_measured": true,
+  "board_id": "210351BE7C3EA",
+  "serial_port": "/dev/ttyUSB1",
+  "baud": 115200,
+  "shots": 8192,
+  "seed": 20261105,
+  "noise": 0.01,
+  "fclk_hz": 100000000,
+  "core_timing_boundary": "input acceptance to first out_valid availability; observer subtracts one cycle",
+  "status_capture_cycles": 3,
+  "core_cycles_measured": true,
+  "exhaustive": {
+    "transactions": 256,
+    "lut_mismatches": 0,
+    "reference_mismatches": 0,
+    "logical_errors": 0,
+    "identity_errors": 79,
+    "cycles_min": 2,
+    "cycles_max": 2,
+    "host_roundtrip_ns_min": 14554323,
+    "host_roundtrip_ns_median": 15880656.5,
+    "host_roundtrip_ns_p99": 16525283.95,
+    "host_roundtrip_ns_max": 16644672
+  },
+  "stim": {
+    "transactions": 8192,
+    "lut_mismatches": 0,
+    "reference_mismatches": 0,
+    "logical_errors": 51,
+    "identity_errors": 458,
+    "cycles_min": 2,
+    "cycles_max": 2,
+    "host_roundtrip_ns_min": 14912443,
+    "host_roundtrip_ns_median": 15858794.0,
+    "host_roundtrip_ns_p99": 16558836.73,
+    "host_roundtrip_ns_max": 16957489
+  },
+  "recovery": [
+    {
+      "case": "bad_checksum",
+      "bad_tx_hex": "a5123700",
+      "rejected_rx_hex": "",
+      "recovered_rx_hex": "5a3101020068"
+    },
+    {
+      "case": "garbage",
+      "bad_tx_hex": "001122ff",
+      "rejected_rx_hex": "",
+      "recovered_rx_hex": "5a3101020068"
+    },
+    {
+      "case": "partial_timeout",
+      "bad_tx_hex": "a512",
+      "rejected_rx_hex": "",
+      "recovered_rx_hex": "5a3101020068"
+    }
+  ],
+  "limitations": "Finite-shot simulated repetition-code observable prediction, not physical quantum correction. UART roundtrip is host/USB/ARM/AXI inclusive, not a feedback deadline."
+}

@@ -1,0 +1,31 @@
+{
+  "source_revision": "bfefc702bd8fc844d6a7bf5db76b10016c0f25aa",
+  "source_status": "?? qec/surface/results/\n",
+  "board_id": "210351BE7C3EA",
+  "port": "/dev/ttyUSB1",
+  "stim_version": "1.16.0",
+  "pymatching_version": "2.4.0",
+  "pyserial_version": "3.5",
+  "numpy_version": "2.5.4",
+  "files": {
+    "circuit.stim": "0ce98c7da3f5cc62f8277bda02dfb065d78d418b5285df7bb9d14a5c7fd7dd99",
+    "d3_z_r3.json": "a09368899353c0d9c04270c586e7fbbe73779d142a79ff2fa4605bfd7f5d3802",
+    "d3_z_r3.mem": "abfd0940bd3ddd6c8f9b98ec174d4f4c8655a337e249966700a2a00a06ee65fd",
+    "sources.tar.gz": "bc6670d2426929ecbf00430b131fa5f3c1d44f4eb74040e6d3a104e25d9cf6cc",
+    "summary.json": "5f4ee7bccbe012dad8b4d729ada4b936149b77ddd9324097396b4b29eb2ff424",
+    "surface_app.elf": "945e34aa7114b9e0ebff7e752131bc685fe8a58b7ce52152b644fc954ce9a678",
+    "surface_bridge_sim.log": "44fe6234a4c93732592c02792feab589027981e9fbfd5ba7276f151a4b1d9427",
+    "surface_build.log": "b245eed8454695dcc5dab39e3c880beec1df0592ccf988fa251df8430c28df96",
+    "surface_firmware_build.log": "7669c12429fa1da5ba19cb712c2b188a778290b40445e6913925eff3b45ac460",
+    "surface_program.log": "413f5d9a383cd14016b931a125797c3c5546e0a1b65befdd5843a7b194608068",
+    "surface_readback.log": "0c54f6be65cebc8518ca5eba0404bfc9b94b8a07887066db3b29b4fd7e8c763f",
+    "surface_sim_d3.log": "897e84a68b96ad9b942d2746569c14cb5352edd805f3890c72dff9cec4889d38",
+    "surface_sim_d5.log": "02cc2e06498e780309ded94f91567a52072325280672c3114e851cdba4f6e1f8",
+    "surface_sim_x.log": "76758aa46f83fdbc26f0925b450729611e479edecdb8a7dd88bf239c3502cc80",
+    "surface_soc.bit": "6be31f08f6bd422af2a753cac2c302b106bd6258064fc239d320814b1bb8cd6e",
+    "surface_soc.xsa": "a02e7e6b4c7d623b982107294cf903da9676b1415e117558b94582cc4a30b843",
+    "top_surface_soc_timing_summary.rpt": "85393f57f0840a826cf0f89bdee529f7027f049e3e43d32290e12e798d272966",
+    "top_surface_soc_utilization.rpt": "6641746a58c37b6437303562b320e91c7f464ed6a559b837845e44a4f64c2356",
+    "transactions.csv": "f71a10c19d17d41ba61d7a552cfae42d0c355955ac7f5b28d2dd385a7a23fbad"
+  }
+}

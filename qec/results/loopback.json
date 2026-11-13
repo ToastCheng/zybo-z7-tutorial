@@ -1,0 +1,14 @@
+{
+  "mode": "software-loopback",
+  "fpga_measured": false,
+  "shots": 20000,
+  "seed": 90210,
+  "noise": 0.001,
+  "prediction_mismatches": 0,
+  "logical_errors": 3,
+  "identity_errors": 109,
+  "response_cycles_min": 0,
+  "response_cycles_max": 0,
+  "host_roundtrip_ns_median": 1278.0,
+  "timing_note": "Loopback cycles are placeholders; real cycles are acceptance-to-result, not UART latency."
+}

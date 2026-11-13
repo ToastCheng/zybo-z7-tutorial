@@ -1,0 +1,2 @@
+# RTL run summary
+Produced by `qec/.venv/bin/python qec/rtl_bridge.py --shots 4096 --seed 314159 --noise 0.03 --out qec/results`. Actual xsim UART RTL returned 4096 validated frames, zero predictor mismatches, 222 logical failures vs identity 668, and 2 decoder acceptance-to-result cycles. No board measurements. See rtl_shots.csv for each shot. The p=.03 run deliberately exercises more nonzero syndromes than p=.001; LUT remains fixed at p=.001.

@@ -1,0 +1,53 @@
+{
+  "status": "programmed-serial-approval-blocked",
+  "fpga_programmed": true,
+  "fpga_decoder_measured": false,
+  "verified_physical_transactions": 0,
+  "source_revision": "39154ad30a0392841ba8c42317b85f9792333275",
+  "rtl_revision": "d9e2cb33841ab8a6a87b20faf80d41d2eecc92ea",
+  "firmware_revision": "68d4619e06dbd9e01cb9834ff3603d991a3b0779",
+  "board_id": "210351BE7C3EA",
+  "serial_target": "/dev/ttyUSB1",
+  "serial_alias": "/dev/serial/by-id/usb-Digilent_Digilent_Adept_USB_Device_210351BE7C3E-if01-port0",
+  "usb_id": "0403:6010",
+  "target": "localhost:3121/xilinx_tcf/Digilent/210351BE7C3EA",
+  "device": "xc7z010_1",
+  "tools": {
+    "vivado": "2025.2 SW Build 6299465",
+    "vitis": "2025.2",
+    "xsct": "2025.2.0 SW Build 6298600"
+  },
+  "configuration_status": {
+    "done_pin": 1,
+    "init_b_pin": 1,
+    "crc_error": 0,
+    "eos": 1,
+    "idcode_error": 0
+  },
+  "timing": {
+    "configured_fclk_hz": 100000000,
+    "routed_wns_ns": 3.192,
+    "routed_whs_ns": 0.053,
+    "simulation_core_availability_cycles": 2,
+    "simulation_status_capture_cycles": 3,
+    "hardware_core_cycles": null,
+    "hardware_host_roundtrip_ns": null
+  },
+  "blocker": "First Python serial probe command did not run: tool approval timed out. Explicit tool response prohibits retry or rephrasing without renewed user consent.",
+  "hashes": {
+    "qec/results/hardware-20261105-usb-blocked/regression.txt": "ad1f95098dd3710433864945718859b602e4d94d467aeb20d85dc0c4ba3ba45d",
+    "qec/results/hardware-20261105-usb-blocked/top_qec_soc_timing_summary.rpt": "491323bcd3de7c2eaf413aa4a219251f50748033eebd2e1564bfc3909c1cbdac",
+    "qec/results/hardware-20261105-usb-blocked/program.txt": "905df2fd9a4ac6937603c2690314413af2f026aa0e14aa7c56c723d1625ecb3e",
+    "qec/results/hardware-20261105-usb-blocked/vivado-build.txt": "c1f86abf45400276be7056618000826155b375f99f74ec1c50bf9fdf78260555",
+    "qec/results/hardware-20261105-usb-blocked/vitis-build.txt": "53f228a86adc4aefc48aee8535424c5ed2aba817c814996879e162e4008b16fc",
+    "qec/results/hardware-20261105-usb-blocked/readback.txt": "a1ae691f52b4c01044d1456ab44131b25f3b74ab49859c3ff7bf32bcb0b69ab9",
+    "qec/results/hardware-20261105-usb-blocked/firmware-parser-test.txt": "20291dda5f860449897167e98dcc9f10eb6822cf4179006d1f049d0ceb6e2d4e",
+    "qec/results/hardware-20261105-usb-blocked/top_qec_soc_utilization.rpt": "25ac93c3f615cba909218c12c01e95513c5e9eb3f83d8a357d3303761bd6cdb1",
+    "qec/results/hardware-20261105-usb-blocked/ps-bridge-simulation.txt": "f0f662acd072640d9bf6de0d3c1e9324ea41a4d06229164c9d988f5c4459d3db",
+    "build/qec_soc.bit": "485bc53329cc40dee31af21909437dc619a7b6f2977239cf9cb8c41fc359a31c",
+    "build/qec_soc.xsa": "53d4c8fe3eee79f6987a5c86e5c68088b82033cf7148d1f0c93f2c9798d1b266",
+    "build/vitis_ws/qec_app/build/qec_app.elf": "db594c1fa65258e44a5bc5a264a816ae4e0df829ff69aa50f6aa2439f2fc8188",
+    "qec/lut.mem": "5b701c6d4b7a86f2331a380305758a3209afee1645c2e548b12f27952a3dc905"
+  },
+  "binary_archive_note": "Binary bitstream/XSA/ELF remain at the hashed build paths; this committed partial archive contains raw tool/status/test reports, not hardware corpus results."
+}

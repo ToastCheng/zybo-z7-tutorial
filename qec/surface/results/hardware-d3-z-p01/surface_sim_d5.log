@@ -1,0 +1,45 @@
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/toastcheng/dev/zybo_z7/rtl/common/surface_decoder.sv" into library work
+INFO: [VRFC 10-311] analyzing module surface_decoder
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/toastcheng/dev/zybo_z7/qec/surface/tb_surface.sv" into library work
+INFO: [VRFC 10-311] analyzing module surface_core_test
+INFO: [VRFC 10-311] analyzing module tb_surface_d3
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/toastcheng/dev/zybo_z7/build/surface_sim_d5_z/wrapper.sv" into library work
+INFO: [VRFC 10-311] analyzing module tb_surface_run
+
+Vivado Simulator v2025.2
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+Running: /home/toastcheng/amd/2025.2/Vivado/bin/unwrapped/lnx64.o/xelab tb_surface_run -s surface_run 
+Multi-threading is on. Using 18 slave threads.
+WARNING: [XSIM 43-3431] One or more environment variables have been detected which affect the operation of the C compiler. These are typically not set in standard installations and are not tested by AMD, however they may be appropriate for your system, so the flow will attempt to continue.  If errors occur, try running xelab with the "-mt off -v 1" switches to see more information from the C compiler. The following environment variables have been detected:
+    LIBRARY_PATH
+Starting static elaboration
+Pass Through NonSizing Optimizer
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling module work.surface_decoder(DETECTORS=72,EDG...
+Compiling module work.surface_core_test(N=72,E=278,CAS...
+Compiling module work.tb_surface_run
+Built simulation snapshot surface_run
+
+
+****** xsim v2025.2 (64-bit)
+  **** SW Build 6299465 on Fri Nov 14 12:34:56 MST 2025
+  **** IP Build 6300035 on Fri Nov 14 10:48:45 MST 2025
+  **** SharedData Build 6298862 on Thu Nov 13 04:50:51 MST 2025
+  **** Start of session at: Thu Nov  5 21:34:07 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/surface_run/xsim_script.tcl
+# xsim {surface_run} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+PASS algorithmic surface N=72 E=278 cases=543 independent cycle edges and backpressure/reset
+$finish called at time : 17151911 ns : File "/home/toastcheng/dev/zybo_z7/qec/surface/tb_surface.sv" Line 33
+exit
+INFO: xsimkernel Simulation Memory Usage: 271312 KB (Peak: 336588 KB), Simulation CPU Usage: 1020 ms
+INFO: [Common 17-206] Exiting xsim at Thu Nov  5 21:34:09 2026...
+

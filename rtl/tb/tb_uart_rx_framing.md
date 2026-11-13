@@ -4,4 +4,4 @@
 
 Stimulus changes on falling clock edges; output checks occur after rising-edge nonblocking updates. A 32-clock bit period leaves margin for the input synchronizer. A watchdog makes missing completion fatal. Recovery is checked after idle; this does not promise arbitrary break/continuous-low or zero-gap malformed-stream resynchronization.
 
-Run from the repository root with `make sim TB=tb_uart_rx_framing`. Before the stop-bit fix, xsim must fail with `Unexpected received byte 0xa5 (count=0)`; after the fix it prints `PASS tb_uart_rx_framing: bad stop rejected, next frame recovered`.
+Run from the repository root with `python scripts/qec_sim.py` (includes this regression). Before the stop-bit fix, xsim must fail with `Unexpected received byte 0xa5 (count=0)`; after the fix it prints `PASS tb_uart_rx_framing: bad stop rejected, next frame recovered`.
