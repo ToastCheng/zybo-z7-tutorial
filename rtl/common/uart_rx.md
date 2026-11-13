@@ -66,4 +66,4 @@ uart_rx #(
 
 ## Testing
 
-See `rtl/tb/tb_uart_rx.sv` for nominal byte reception. Run `python scripts/qec_sim.py` for the paired [`tb_uart_rx_framing`](../tb/tb_uart_rx_framing.md) regression: an incoming `0xA5` with a LOW stop bit must produce no pulse, then a valid `0x3C` after idle must produce exactly one single-cycle pulse without reset.
+See `rtl/tb/tb_uart_rx.sv` for nominal byte reception. Run `make sim TB=tb_uart_rx_framing` for the paired [`tb_uart_rx_framing`](../tb/tb_uart_rx_framing.md) regression: an incoming `0xA5` with a LOW stop bit must produce no pulse, then a valid `0x3C` after idle must produce exactly one single-cycle pulse without reset.
